@@ -98,10 +98,6 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField]
   private SocketIOManager SocketManager;
 
-  [SerializeField] private BonusController bonusController;
-  [SerializeField] private LinkBonusController linkBonusController;
-  [SerializeField] private float linkBonusPreSpinGlowDuration = 0.5f;
-
   private List<Tweener> alltweens = new List<Tweener>();
   private Coroutine AutoSpinRoutine = null;
   private Coroutine tweenroutine;
@@ -521,9 +517,6 @@ public class SlotBehaviour : MonoBehaviour
         case "wheelBonus":
           yield return StartCoroutine(HandleWheelBonus(feature));
           break;
-        case "linkBonus":
-          yield return StartCoroutine(HandleLinkBonus(feature));
-          break;
       }
       uiManager.SetReelFrame("default");
     }
@@ -550,9 +543,6 @@ public class SlotBehaviour : MonoBehaviour
       ?.Find(f => f.feature == "wheelBonus");
     double awardValue = wbFeature?.awardValue ?? 0;
     List<string> spinHistory = wbFeature?.spinHistory ?? new List<string> { wbFeature?.jackpotTier ?? "mini" };
-
-    if (bonusController != null) bonusController.StartWheelBonus(spinHistory, awardValue);
-    yield return new WaitUntil(() => bonusController == null || bonusController.isBonusDone);
 
     yield return StartCoroutine(uiManager.SlideContentUp());
 
@@ -649,81 +639,6 @@ public class SlotBehaviour : MonoBehaviour
     CheckPopups = false;
   }
 
-  private IEnumerator HandleLinkBonus(PendingFeature feature)
-  {
-    StartCoroutine(uiManager.SlideContentDown());
-    yield return StartCoroutine(uiManager.PlayFeatureIntro("linkBonus"));
-    StartCoroutine(uiManager.SlideContentUp());
-    if (audioManager) audioManager.PlayBonusBgMusic();
-    _isFeatureActive = true;
-    uiManager.LockFeatureUI(true);
-    ToggleButtonGrp(false);
-    CheckPopups = true;
-
-    var targetZones = SocketManager.ResultData.payload?.linkBonusTargetZones;
-    int initialSpins = SocketManager.ResultData.payload?.freeSpinsRemaining ?? 3;
-
-    uiManager.SetupFeaturePinata("linkBonus");
-    uiManager.UpdateLinkBonusSpinsRemaining(initialSpins);
-
-    yield return StartCoroutine(linkBonusController.StartLinkBonus(targetZones));
-
-    _isInFreeSpin = true;
-    if (audioManager) audioManager.PlayFreeGameStarted();
-    yield return StartCoroutine(LinkBonusFreeSpinLoop());
-    _isInFreeSpin = false;
-
-    var lbFeature = SocketManager.ResultData.payload?.triggeredFeatures?.Find(f => f.feature == "linkBonus");
-    double awardValue = lbFeature?.awardValue ?? 0;
-    var allLockedCells = lbFeature?.lockedCells ?? SocketManager.ResultData.payload?.linkBonusLockedCells;
-
-    yield return StartCoroutine(linkBonusController.PlayTotalWinSequence(allLockedCells, awardValue));
-    yield return StartCoroutine(uiManager.ShowBonusWinSequence(awardValue, currentTotalBet));
-
-    if (audioManager) audioManager.StopBonusBgMusic();
-    uiManager.CleanupFeaturePinata("linkBonus");
-    linkBonusController.ResetAll();
-
-    uiManager.UpdateBalance(SocketManager.ResultData.player.balance);
-    currentBalance = SocketManager.PlayerData.balance;
-
-    _isFeatureActive = false;
-    uiManager.LockFeatureUI(false);
-  }
-
-  private IEnumerator LinkBonusFreeSpinLoop()
-  {
-    while (true)
-    {
-      yield return new WaitForSeconds(SpinDelay);
-      yield return StartCoroutine(LinkBonusSpinRound());
-      if (!(SocketManager.ResultData.payload?.isBluePinataLinkBonus ?? false)) break;
-    }
-  }
-
-  private IEnumerator LinkBonusSpinRound()
-  {
-    uiManager.PlayBustedPinataOnce("blue");
-    linkBonusController.ShowPreSpinGlow();
-    yield return new WaitForSeconds(linkBonusPreSpinGlowDuration);
-    linkBonusController.HidePreSpinGlow();
-
-    linkBonusController.StartSpinRound();
-
-    SocketManager.AccumulateResult(BetCounter);
-    yield return new WaitUntil(() => SocketManager.isResultdone);
-
-    var matrix = SocketManager.ResultData.matrix;
-    var lockedCells = SocketManager.ResultData.payload?.linkBonusLockedCells;
-    int spinsRemaining = SocketManager.ResultData.payload?.freeSpinsRemaining ?? 0;
-
-    yield return StartCoroutine(linkBonusController.StopCellsSequential(matrix, lockedCells));
-    linkBonusController.UpdateLockedCells(lockedCells);
-    uiManager.UpdateLinkBonusSpinsRemaining(spinsRemaining);
-
-    uiManager.UpdateBalance(SocketManager.ResultData.player.balance);
-    currentBalance = SocketManager.PlayerData.balance;
-  }
   #endregion
 
   internal void CallCloseSocket()
