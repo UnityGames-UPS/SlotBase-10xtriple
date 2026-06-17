@@ -1,0 +1,884 @@
+fileFormatVersion: 2
+guid: f9af25d82d65ab24a833b54ae0b830a4
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -3092960095282176970
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_0
+  - first:
+      213: -3730524547159005209
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_1
+  - first:
+      213: -196130632953082839
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_2
+  - first:
+      213: 8869579514496582971
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_3
+  - first:
+      213: -6028237651672918538
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_4
+  - first:
+      213: -1653406717984185516
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_5
+  - first:
+      213: -3033376032517375663
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_6
+  - first:
+      213: -4969833272797233525
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_7
+  - first:
+      213: 4369416294744350662
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_8
+  - first:
+      213: -2432608538868621957
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_9
+  - first:
+      213: 4596824186857864355
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_10
+  - first:
+      213: 5631317440454274891
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_11
+  - first:
+      213: -2302582852426245603
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_12
+  - first:
+      213: 1118566147895249901
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_13
+  - first:
+      213: 1078054151508630381
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_14
+  - first:
+      213: -5835090192719572226
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_15
+  - first:
+      213: 6404116514740693322
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_16
+  - first:
+      213: 1257231602034628812
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_17
+  - first:
+      213: -4655757779489521228
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_18
+  - first:
+      213: 1970711022670649889
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_19
+  - first:
+      213: -3527949006979130422
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_20
+  - first:
+      213: 6795145843741402663
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_21
+  - first:
+      213: -6653774142106527916
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_22
+  - first:
+      213: 7862304664255558490
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_23
+  - first:
+      213: 4979471267471596475
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_24
+  - first:
+      213: 548525238434951315
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_25
+  - first:
+      213: -8309613593250319260
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_26
+  - first:
+      213: -7275515091456351230
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_27
+  - first:
+      213: 8080183791253320564
+    second: PinataTrio_btn_slotmachinebuttons_1320x850_v01_28
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_0
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 724
+        width: 69
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 63c5f383e299315d0800000000000000
+      internalID: -3092960095282176970
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_1
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 707
+        width: 106
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e766b480b38a3cc0800000000000000
+      internalID: -3730524547159005209
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_2
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 710
+        width: 146
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 92c424d7a34374df0800000000000000
+      internalID: -196130632953082839
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_3
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 708
+        width: 103
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b3586ac4393171b70800000000000000
+      internalID: 8869579514496582971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_4
+      rect:
+        serializedVersion: 2
+        x: 522
+        y: 691
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f596667bc5675ca0800000000000000
+      internalID: -6028237651672918538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_5
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 696
+        width: 172
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 453ee41a95bed09e0800000000000000
+      internalID: -1653406717984185516
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_6
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 699
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1593e97e19847e5d0800000000000000
+      internalID: -3033376032517375663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_7
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 574
+        width: 69
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8ef00e38fa970bb0800000000000000
+      internalID: -4969833272797233525
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_8
+      rect:
+        serializedVersion: 2
+        x: 103
+        y: 557
+        width: 106
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6cf5a0c48f843ac30800000000000000
+      internalID: 4369416294744350662
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_9
+      rect:
+        serializedVersion: 2
+        x: 214
+        y: 560
+        width: 146
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b7d57232c63ad3ed0800000000000000
+      internalID: -2432608538868621957
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_10
+      rect:
+        serializedVersion: 2
+        x: 372
+        y: 558
+        width: 103
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3ac36903e333bcf30800000000000000
+      internalID: 4596824186857864355
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_11
+      rect:
+        serializedVersion: 2
+        x: 528
+        y: 545
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b4f2db74065762e40800000000000000
+      internalID: 5631317440454274891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_12
+      rect:
+        serializedVersion: 2
+        x: 838
+        y: 546
+        width: 172
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1a5a3768159b00e0800000000000000
+      internalID: -2302582852426245603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_13
+      rect:
+        serializedVersion: 2
+        x: 1026
+        y: 549
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: debc21f2cf1f58f00800000000000000
+      internalID: 1118566147895249901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_14
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 403
+        width: 69
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6b9e4df98406fe00800000000000000
+      internalID: 1078054151508630381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_15
+      rect:
+        serializedVersion: 2
+        x: 105
+        y: 386
+        width: 106
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ef29596a268950fa0800000000000000
+      internalID: -5835090192719572226
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_16
+      rect:
+        serializedVersion: 2
+        x: 216
+        y: 389
+        width: 146
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a49e4592a0effd850800000000000000
+      internalID: 6404116514740693322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_17
+      rect:
+        serializedVersion: 2
+        x: 374
+        y: 387
+        width: 103
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cc85baf1b75927110800000000000000
+      internalID: 1257231602034628812
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_18
+      rect:
+        serializedVersion: 2
+        x: 530
+        y: 368
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4b1044187fc636fb0800000000000000
+      internalID: -4655757779489521228
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_19
+      rect:
+        serializedVersion: 2
+        x: 840
+        y: 375
+        width: 172
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12a1b3ddb3f595b10800000000000000
+      internalID: 1970711022670649889
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_20
+      rect:
+        serializedVersion: 2
+        x: 1028
+        y: 378
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: acb115de1153a0fc0800000000000000
+      internalID: -3527949006979130422
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_21
+      rect:
+        serializedVersion: 2
+        x: 16
+        y: 240
+        width: 69
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 726ad2584253d4e50800000000000000
+      internalID: 6795145843741402663
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_22
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 223
+        width: 106
+        height: 90
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4579f04cbab09a3a0800000000000000
+      internalID: -6653774142106527916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_23
+      rect:
+        serializedVersion: 2
+        x: 217
+        y: 226
+        width: 146
+        height: 98
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a5379d49f648c1d60800000000000000
+      internalID: 7862304664255558490
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_24
+      rect:
+        serializedVersion: 2
+        x: 375
+        y: 224
+        width: 103
+        height: 92
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bbb98e24cb2aa1540800000000000000
+      internalID: 4979471267471596475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_25
+      rect:
+        serializedVersion: 2
+        x: 534
+        y: 212
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 39070435cc0cc9700800000000000000
+      internalID: 548525238434951315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_26
+      rect:
+        serializedVersion: 2
+        x: 841
+        y: 212
+        width: 172
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 464be8196725eac80800000000000000
+      internalID: -8309613593250319260
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_27
+      rect:
+        serializedVersion: 2
+        x: 1029
+        y: 215
+        width: 269
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 20420c7529d280b90800000000000000
+      internalID: -7275515091456351230
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: PinataTrio_btn_slotmachinebuttons_1320x850_v01_28
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 57
+        width: 324
+        height: 87
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 473f585f854922070800000000000000
+      internalID: 8080183791253320564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_0: -3092960095282176970
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_1: -3730524547159005209
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_10: 4596824186857864355
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_11: 5631317440454274891
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_12: -2302582852426245603
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_13: 1118566147895249901
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_14: 1078054151508630381
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_15: -5835090192719572226
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_16: 6404116514740693322
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_17: 1257231602034628812
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_18: -4655757779489521228
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_19: 1970711022670649889
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_2: -196130632953082839
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_20: -3527949006979130422
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_21: 6795145843741402663
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_22: -6653774142106527916
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_23: 7862304664255558490
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_24: 4979471267471596475
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_25: 548525238434951315
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_26: -8309613593250319260
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_27: -7275515091456351230
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_28: 8080183791253320564
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_3: 8869579514496582971
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_4: -6028237651672918538
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_5: -1653406717984185516
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_6: -3033376032517375663
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_7: -4969833272797233525
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_8: 4369416294744350662
+      PinataTrio_btn_slotmachinebuttons_1320x850_v01_9: -2432608538868621957
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

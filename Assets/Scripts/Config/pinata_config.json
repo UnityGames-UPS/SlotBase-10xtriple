@@ -1,0 +1,237 @@
+{
+  "id": "SL-PT",
+  "bets": [0.05, 0.1, 0.2, 0.25, 0.5, 0.75, 1],
+  "matrix": {
+    "x": 5,
+    "y": 3
+  },
+  "symbols": [
+    {
+      "id": 0,
+      "name": "yellow",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 100,
+        "1": 100,
+        "2": 100,
+        "3": 100,
+        "4": 100
+      }
+    },
+    {
+      "id": 1,
+      "name": "pink",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 100,
+        "1": 100,
+        "2": 100,
+        "3": 100,
+        "4": 100
+      }
+    },
+    {
+      "id": 2,
+      "name": "blue",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 100,
+        "1": 100,
+        "2": 100,
+        "3": 100,
+        "4": 100
+      }
+    },
+    {
+      "id": 3,
+      "name": "mini",
+      "payout": 0,
+      "multiplier": 1.5,
+      "reelsInstance": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      }
+    },
+    {
+      "id": 4,
+      "name": "minor",
+      "payout": 0,
+      "multiplier": 2,
+      "reelsInstance": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      }
+    },
+    {
+      "id": 5,
+      "name": "major",
+      "payout": 0,
+      "multiplier": 3,
+      "reelsInstance": {
+        "0": 1,
+        "1": 1,
+        "2": 1,
+        "3": 1,
+        "4": 1
+      }
+    },
+    {
+      "id": 6,
+      "name": "mega",
+      "payout": 0,
+      "multiplier": 5,
+      "reelsInstance": {
+        "0": 1,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 1
+      }
+    },
+    {
+      "id": 7,
+      "name": "grand",
+      "payout": 0,
+      "multiplier": 10,
+      "reelsInstance": {
+        "0": 1,
+        "1": 0,
+        "2": 1,
+        "3": 0,
+        "4": 0
+      }
+    },
+    {
+      "id": 8,
+      "name": "greenPinata",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 5,
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 5
+      }
+    },
+    {
+      "id": 9,
+      "name": "redPinata",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 5,
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 5
+      }
+    },
+    {
+      "id": 10,
+      "name": "bluePinata",
+      "payout": 0,
+      "reelsInstance": {
+        "0": 5,
+        "1": 5,
+        "2": 5,
+        "3": 5,
+        "4": 5
+      }
+    }
+  ],
+  "features": {
+    "pinataMeters": {
+      "enabled": true,
+      "meters": [
+        {
+          "id": "greenPinata",
+          "feature": "wheelBonus",
+          "threshold": 10,
+          "thresholdMultiplier": 1.5
+        },
+        {
+          "id": "redPinata",
+          "feature": "freeSpins",
+          "threshold": 30,
+          "thresholdMultiplier": 3
+        },
+        {
+          "id": "bluePinata",
+          "feature": "linkBonus",
+          "threshold": 20,
+          "thresholdMultiplier": 2
+        }
+      ]
+    },
+    "wheelBonus": {
+      "triggeredBy": "greenPinata",
+      "segments": [
+        {
+          "type": "mini",
+          "prob": 0.35
+        },
+        {
+          "type": "minor",
+          "prob": 0.25
+        },
+        {
+          "type": "major",
+          "prob": 0.15
+        },
+        {
+          "type": "mega",
+          "prob": 0.1
+        },
+        {
+          "type": "grand",
+          "prob": 0.05
+        },
+        {
+          "type": "boost",
+          "prob": 0.1
+        }
+      ]
+    },
+    "freeSpins": {
+      "triggeredBy": "redPinata",
+      "pickJackpot": true,
+      "jackpotOptions": ["mini", "minor", "major", "mega", "grand"],
+      "spinsUntilWin": true,
+      "multiplierProb": [0.5, 0.3, 0.2]
+    },
+    "linkBonus": {
+      "triggeredBy": "bluePinata",
+      "respins": 3,
+      "zones": 3,
+      "zoneMultipliers": [2, 3, 5],
+      "linkSymbols": [
+        "mini",
+        "minor",
+        "major",
+        "mega",
+        "grand",
+        "yellow",
+        "purple",
+        "blue"
+      ]
+    },
+    "dynamicPrizes": {
+      "coinValues": [0.01, 0.02, 0.05, 0.1],
+      "coinValuesProb": [0.4, 0.3, 0.25, 0.05],
+      "coinCount": [0, 1, 2, 3],
+      "coinCountProb": [0.5, 0.3, 0.15, 0.05]
+    }
+  },
+  "created_at": "",
+  "updated_at": "",
+  "_id": "",
+  "gameId": "",
+  "isActive": true,
+  "createdAt": "",
+  "updatedAt": ""
+}

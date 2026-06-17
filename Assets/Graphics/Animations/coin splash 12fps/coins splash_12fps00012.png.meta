@@ -1,0 +1,598 @@
+fileFormatVersion: 2
+guid: 65ab9673c6044c94db4e74979eb5e7db
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 2643907328306549381
+    second: coins splash_12fps00012_0
+  - first:
+      213: -7137603196244295607
+    second: coins splash_12fps00012_1
+  - first:
+      213: 2721726097627836288
+    second: coins splash_12fps00012_2
+  - first:
+      213: 2062034286693173647
+    second: coins splash_12fps00012_3
+  - first:
+      213: 8973073152471580594
+    second: coins splash_12fps00012_4
+  - first:
+      213: -4700627478336108164
+    second: coins splash_12fps00012_5
+  - first:
+      213: -7507541489173634031
+    second: coins splash_12fps00012_6
+  - first:
+      213: -7136556258150754081
+    second: coins splash_12fps00012_7
+  - first:
+      213: 2629387965759347979
+    second: coins splash_12fps00012_8
+  - first:
+      213: -1988845215256662693
+    second: coins splash_12fps00012_9
+  - first:
+      213: -1542208165861394457
+    second: coins splash_12fps00012_10
+  - first:
+      213: -5631974810769690744
+    second: coins splash_12fps00012_11
+  - first:
+      213: -486301988540354916
+    second: coins splash_12fps00012_12
+  - first:
+      213: -3996053800611626486
+    second: coins splash_12fps00012_13
+  - first:
+      213: 6988394240954663121
+    second: coins splash_12fps00012_14
+  - first:
+      213: -6602040254729207426
+    second: coins splash_12fps00012_15
+  - first:
+      213: -2175935308411040211
+    second: coins splash_12fps00012_16
+  - first:
+      213: -3390541100542031145
+    second: coins splash_12fps00012_17
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: coins splash_12fps00012_0
+      rect:
+        serializedVersion: 2
+        x: 21
+        y: 468
+        width: 40
+        height: 44
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 58293c205bb01b420800000000000000
+      internalID: 2643907328306549381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_1
+      rect:
+        serializedVersion: 2
+        x: 220
+        y: 136
+        width: 362
+        height: 504
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9408a2ca5b322fc90800000000000000
+      internalID: -7137603196244295607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_2
+      rect:
+        serializedVersion: 2
+        x: 616
+        y: 216
+        width: 189
+        height: 321
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 08f6409277385c520800000000000000
+      internalID: 2721726097627836288
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_3
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 362
+        width: 49
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f89c5053241dd9c10800000000000000
+      internalID: 2062034286693173647
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_4
+      rect:
+        serializedVersion: 2
+        x: 82
+        y: 340
+        width: 89
+        height: 88
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2bfb9a4ad72c68c70800000000000000
+      internalID: 8973073152471580594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_5
+      rect:
+        serializedVersion: 2
+        x: 15
+        y: 288
+        width: 34
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c790654a63404ceb0800000000000000
+      internalID: -4700627478336108164
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_6
+      rect:
+        serializedVersion: 2
+        x: 61
+        y: 236
+        width: 66
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1146c41dacadfc790800000000000000
+      internalID: -7507541489173634031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_7
+      rect:
+        serializedVersion: 2
+        x: 106
+        y: 182
+        width: 110
+        height: 102
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fd85551f4ebd5fc90800000000000000
+      internalID: -7136556258150754081
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_8
+      rect:
+        serializedVersion: 2
+        x: 210
+        y: 157
+        width: 56
+        height: 57
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0dd5cb7c667d7420800000000000000
+      internalID: 2629387965759347979
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_9
+      rect:
+        serializedVersion: 2
+        x: 471
+        y: 122
+        width: 179
+        height: 153
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b5d246760d33664e0800000000000000
+      internalID: -1988845215256662693
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 98
+        width: 57
+        height: 60
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7e7ff1818d9f89ae0800000000000000
+      internalID: -1542208165861394457
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_11
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 45
+        width: 38
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 88fef14cfb437d1b0800000000000000
+      internalID: -5631974810769690744
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_12
+      rect:
+        serializedVersion: 2
+        x: 361
+        y: 56
+        width: 68
+        height: 45
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c9e6c7ffaee4049f0800000000000000
+      internalID: -486301988540354916
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_13
+      rect:
+        serializedVersion: 2
+        x: 713
+        y: 31
+        width: 92
+        height: 76
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a02c1378d3a2b88c0800000000000000
+      internalID: -3996053800611626486
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_14
+      rect:
+        serializedVersion: 2
+        x: 133
+        y: 4
+        width: 57
+        height: 73
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1d00d7a3983cbf060800000000000000
+      internalID: 6988394240954663121
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_15
+      rect:
+        serializedVersion: 2
+        x: 202
+        y: 15
+        width: 68
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e7149001e57d064a0800000000000000
+      internalID: -6602040254729207426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_16
+      rect:
+        serializedVersion: 2
+        x: 470
+        y: 0
+        width: 65
+        height: 69
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d2e0ee79d568dc1e0800000000000000
+      internalID: -2175935308411040211
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: coins splash_12fps00012_17
+      rect:
+        serializedVersion: 2
+        x: 611
+        y: 0
+        width: 50
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7da84d935d062f0d0800000000000000
+      internalID: -3390541100542031145
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      coins splash_12fps00012_0: 2643907328306549381
+      coins splash_12fps00012_1: -7137603196244295607
+      coins splash_12fps00012_10: -1542208165861394457
+      coins splash_12fps00012_11: -5631974810769690744
+      coins splash_12fps00012_12: -486301988540354916
+      coins splash_12fps00012_13: -3996053800611626486
+      coins splash_12fps00012_14: 6988394240954663121
+      coins splash_12fps00012_15: -6602040254729207426
+      coins splash_12fps00012_16: -2175935308411040211
+      coins splash_12fps00012_17: -3390541100542031145
+      coins splash_12fps00012_2: 2721726097627836288
+      coins splash_12fps00012_3: 2062034286693173647
+      coins splash_12fps00012_4: 8973073152471580594
+      coins splash_12fps00012_5: -4700627478336108164
+      coins splash_12fps00012_6: -7507541489173634031
+      coins splash_12fps00012_7: -7136556258150754081
+      coins splash_12fps00012_8: 2629387965759347979
+      coins splash_12fps00012_9: -1988845215256662693
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
