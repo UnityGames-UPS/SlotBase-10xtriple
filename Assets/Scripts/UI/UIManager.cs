@@ -944,11 +944,6 @@ public class UIManager : MonoBehaviour
   internal void InitialiseUI(List<double> bets, List<Symbol> symbols)
   {
     betAmounts = bets;
-    foreach (var symbol in symbols)
-    {
-      if (symbol.id >= 3 && symbol.id <= 7 && symbol.multiplier?[0] != null)
-        jackpotMultipliers[symbol.id - 3] = symbol.multiplier[0].Value;
-    }
     UpdateBetDisplay(betAmounts[0]);
   }
 

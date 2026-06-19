@@ -1,0 +1,134 @@
+{
+  "id": "SL-TXT",
+  "bets": [
+    0.01, 0.02, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 1, 2, 5
+  ],
+  "lines": [
+    [1, 1, 1],
+    [0, 0, 0],
+    [2, 2, 2],
+    [0, 1, 2],
+    [2, 1, 0]
+  ],
+  "matrix": {
+    "x": 3,
+    "y": 3
+  },
+  "symbols": [
+    {
+      "id": 0,
+      "name": "Single BAR",
+      "multiplier": [0.5],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 25, "1": 25, "2": 25 }
+    },
+    {
+      "id": 1,
+      "name": "Double BAR",
+      "multiplier": [1],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 25, "1": 25, "2": 25 }
+    },
+    {
+      "id": 2,
+      "name": "Triple BAR",
+      "multiplier": [3],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 15, "1": 15, "2": 15 }
+    },
+    {
+      "id": 3,
+      "name": "Bell",
+      "multiplier": [6],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 14, "1": 14, "2": 14 }
+    },
+    {
+      "id": 4,
+      "name": "Red 7",
+      "multiplier": [8],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 12, "1": 12, "2": 12 }
+    },
+    {
+      "id": 5,
+      "name": "2x Wild",
+      "isWild": true,
+      "multiplier": [25],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 3, "1": 3, "2": 3 },
+      "wildMultiplier": 2
+    },
+    {
+      "id": 6,
+      "name": "3x Wild",
+      "isWild": true,
+      "multiplier": [75],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "wildMultiplier": 3
+    },
+    {
+      "id": 7,
+      "name": "5x Wild",
+      "isWild": true,
+      "multiplier": [150],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "wildMultiplier": 5
+    },
+    {
+      "id": 8,
+      "name": "10x Wild",
+      "isWild": true,
+      "multiplier": [0],
+      "useWildSub": true,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "wildMultiplier": 10,
+      "isGrandJackpotTrigger": true
+    },
+    {
+      "id": 9,
+      "name": "Scatter",
+      "multiplier": [0],
+      "useWildSub": false,
+      "isBonusSymbol": true,
+      "reelsInstance": { "0": 3, "1": 3, "2": 3 }
+    }
+  ],
+  "features": {
+    "jackpot": {
+      "name": "Grand Jackpot",
+      "type": "fixed",
+      "value": 20,
+      "enabled": true,
+      "scaleWithBet": false,
+      "triggerSymbolId": 8
+    },
+    "freeSpins": {
+      "enabled": true,
+      "spinCount": 7,
+      "replaceReelIndex": 1,
+      "triggerScatterCount": 3,
+      "specialReelSymbolsOnly": [5, 6, 7, 8]
+    },
+    "wildRules": {
+      "mixedWildPayouts": [
+        { "payout": 50, "highestWildPresent": 10 },
+        { "payout": 15, "highestWildPresent": 5 },
+        { "payout": 8, "highestWildPresent": 3 }
+      ],
+      "pureWildLineOverride": true,
+      "multiplicationEnabled": true
+    }
+  }
+}

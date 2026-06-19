@@ -13,36 +13,37 @@ public class SocketIOManager : MonoBehaviour
   [SerializeField] private UIManager uiManager;
   [SerializeField] internal JSFunctCalls JSManager;
   [SerializeField] private string testToken;
+  [SerializeField] private GameObject RaycastBlocker;
   internal GameData InitialData = null;
   internal UiData UIData = null;
-  internal Features GameFeatures = null;
-  internal MeterCurrentState CurrentMeterState = null;
-  internal ServerResponse ResultData = null;
+  internal Root ResultData = null;
   internal Player PlayerData = null;
   internal bool isResultdone = false;
-  internal bool isWheelBonusDone = false;
-  internal bool isPickJackpotDone = false;
   internal bool SetInit = false;
 
   private SocketManager manager;
   protected string SocketURI = null;
+  // protected string TestSocketURI = "https://game-crm-rtp-backend.onrender.com/";
   protected string TestSocketURI = "https://devrealtime.dingdinghouse.com";
   protected string nameSpace = "playground";
   private Socket gameSocket;
-  protected string gameID = "SL-PT";
+  protected string gameID = "SL-VIK";
+  //protected string gameID = "";
   private const int maxReconnectionAttempts = 6;
   private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);
   string myAuth = null;
 
-  private bool isConnected = false;
+  private bool isConnected = false; //Back2 Start
   private bool hasEverConnected = false;
+  private const int MaxReconnectAttempts = 5;
+  private const float ReconnectDelaySeconds = 2f;
 
   private float lastPongTime = 0f;
   private float pingInterval = 2f;
   private float pongTimeout = 3f;
   private bool waitingForPong = false;
   private int missedPongs = 0;
-  private const int MaxMissedPongs = 15;
+  private const int MaxMissedPongs = 5;
   private Coroutine PingRoutine; //Back2 end
   private void Awake()
   {
@@ -188,12 +189,12 @@ public class SocketIOManager : MonoBehaviour
 
   private void OnPongReceived(string data) //Back2 Start
   {
-    //Debug.Log("✅ Received pong from server.");
+    Debug.Log("✅ Received pong from server.");
     waitingForPong = false;
     missedPongs = 0;
     lastPongTime = Time.time;
-    //Debug.Log($"⏱️ Updated last pong time: {lastPongTime}");
-    //Debug.Log($"📦 Pong payload: {data}");
+    Debug.Log($"⏱️ Updated last pong time: {lastPongTime}");
+    Debug.Log($"📦 Pong payload: {data}");
   } //Back2 end
 
 private void OnError(Error err)
@@ -256,7 +257,7 @@ private void OnError(Error err)
   {
     while (true)
     {
-      //Debug.Log($"🟡 PingCheck | waitingForPong: {waitingForPong}, missedPongs: {missedPongs}, timeSinceLastPong: {Time.time - lastPongTime}");
+      Debug.Log($"🟡 PingCheck | waitingForPong: {waitingForPong}, missedPongs: {missedPongs}, timeSinceLastPong: {Time.time - lastPongTime}");
 
       if (missedPongs == 0)
       {
@@ -266,9 +267,11 @@ private void OnError(Error err)
       // If waiting for pong, and timeout passed
       if (waitingForPong)
       {
-        missedPongs++;
-        if (missedPongs >= 2)
+        if (missedPongs == 2)
+        {
           uiManager.ReconnectionPopup(missedPongs, MaxMissedPongs);
+        }
+        missedPongs++;
         Debug.LogWarning($"⚠️ Pong missed #{missedPongs}/{MaxMissedPongs}");
 
         if (missedPongs >= MaxMissedPongs)
@@ -283,7 +286,7 @@ private void OnError(Error err)
       // Send next ping
       waitingForPong = true;
       lastPongTime = Time.time;
-      //Debug.Log("📤 Sending ping...");
+      Debug.Log("📤 Sending ping...");
       SendDataWithNamespace("ping");
       yield return new WaitForSeconds(pingInterval);
     }
@@ -311,6 +314,7 @@ private void OnError(Error err)
 
   internal IEnumerator CloseSocket() //Back2 Start
   {
+    RaycastBlocker.SetActive(true);
     ResetPingRoutine();
 
     Debug.Log("Closing Socket");
@@ -332,25 +336,27 @@ private void OnError(Error err)
   private void ParseResponse(string jsonObject)
   {
     Debug.Log(jsonObject);
-    ServerResponse myData = JsonConvert.DeserializeObject<ServerResponse>(jsonObject);
-    if (myData == null) return;
+    Root myData = JsonConvert.DeserializeObject<Root>(jsonObject);
+
     string id = myData.id;
 
     switch (id)
     {
       case "initData":
         {
-          Debug.Log("Fourth Build Confirmation");
           InitialData = myData.gameData;
           UIData = myData.uiData;
           PlayerData = myData.player;
-          GameFeatures = myData.features;
-          CurrentMeterState = myData.features?.pinataMeters?.currentState;
 
           if (!SetInit)
           {
-            InitialiseGame();
+            List<string> LinesString = ConvertListListIntToListString(InitialData.lines);
+            PopulateSlotSocket(LinesString);
             SetInit = true;
+          }
+          else
+          {
+            RefreshUI();
           }
           break;
         }
@@ -358,42 +364,30 @@ private void OnError(Error err)
         {
           ResultData = myData;
           PlayerData = myData.player;
-          UpdateMeterState(myData.payload?.meters);
           isResultdone = true;
-          break;
-        }
-      case "WheelBonusResult":
-        {
-          ResultData = myData;
-          PlayerData = myData.player;
-          isWheelBonusDone = true;
-          break;
-        }
-      case "PickJackpotResult":
-        {
-          ResultData = myData;
-          PlayerData = myData.player;
-          isPickJackpotDone = true;
           break;
         }
     }
   }
 
-  private void UpdateMeterState(MetersUpdate meters)
+  private void RefreshUI()
   {
-    if (meters == null || CurrentMeterState == null) return;
-    CurrentMeterState.greenMeter = meters.greenMeter;
-    CurrentMeterState.redMeter = meters.redMeter;
-    CurrentMeterState.blueMeter = meters.blueMeter;
+    uiManager.InitialiseUI(InitialData.bets, UIData.paylines.symbols);
   }
 
-  private void InitialiseGame()
+  private void PopulateSlotSocket(List<string> LineIds)
   {
+    // slotManager.shuffleInitialMatrix();
     slotManager.InitializeMatrix();
+    for (int i = 0; i < LineIds.Count; i++)
+    {
+      slotManager.FetchLines(LineIds[i], i);
+    }
     slotManager.SetInitialUI();
 #if UNITY_WEBGL && !UNITY_EDITOR
     JSManager.SendCustomMessage("OnEnter");
 #endif
+    RaycastBlocker.SetActive(false);
   }
 
   internal void AccumulateResult(int currBet)
@@ -408,27 +402,28 @@ private void OnError(Error err)
     SendDataWithNamespace("request", json);
   }
 
-  internal void SendWheelBonus()
+  private List<string> ConvertListListIntToListString(List<List<int>> listOfLists)
   {
-    isWheelBonusDone = false;
-    MessageData message = new();
-    message.type = "WHEELBONUS";
-    string json = JsonUtility.ToJson(message);
-    SendDataWithNamespace("request", json);
-  }
+    List<string> resultList = new List<string>();
 
-  internal void SendPickJackpot()
-  {
-    isPickJackpotDone = false;
-    MessageData message = new();
-    message.type = "PICKJACKPOT";
-    string json = JsonUtility.ToJson(message);
-    SendDataWithNamespace("request", json);
-  }
+    foreach (List<int> innerList in listOfLists)
+    {
+      // Convert each integer in the inner list to string
+      List<string> stringList = new List<string>();
+      foreach (int number in innerList)
+      {
+        stringList.Add(number.ToString());
+      }
 
+      // Join the string representation of integers with ","
+      string joinedString = string.Join(",", stringList.ToArray()).Trim();
+      resultList.Add(joinedString);
+    }
+
+    return resultList;
+  }
 }
 
-// ─── Emit Models ────────────────────────────────────────────────────────────
 [Serializable]
 public class MessageData
 {
@@ -445,145 +440,69 @@ public class Data
   public int option;
 }
 
-// ─── SL-PT Server Response Models ───────────────────────────────────────────
-
-// Top-level wrapper — handles initData, ResultData, WheelBonusResult, PickJackpotResult
-[Serializable]
-public class ServerResponse
-{
-  public string id { get; set; }
-  public bool success { get; set; }
-  // initData fields
-  public GameData gameData { get; set; }
-  public Features features { get; set; }
-  public UiData uiData { get; set; }
-  // ResultData fields
-  public List<List<string>> matrix { get; set; }
-  public SpinPayload payload { get; set; }
-  // Shared
-  public Player player { get; set; }
-}
-
 [Serializable]
 public class GameData
 {
+  public List<List<int>> lines { get; set; }
   public List<double> bets { get; set; }
+}
+
+[Serializable]
+public class FreeSpins
+{
+  public int count { get; set; }
+  public bool isFreeSpin { get; set; }
+}
+
+[Serializable]
+public class Root
+{
+  public bool success { get; set; }
+  public List<List<string>> matrix { get; set; }
+  public Payload payload { get; set; }
+  public Features features { get; set; }
+  //Initial Data
+  public string id { get; set; }
+  public GameData gameData { get; set; }
+  public UiData uiData { get; set; }
+  public Player player { get; set; }
 }
 
 [Serializable]
 public class Features
 {
-  public PinataMeters pinataMeters { get; set; }
+  public FreeSpins freeSpin { get; set; }
+  public Jackpot jackpot { get; set; }
 }
 
 [Serializable]
-public class PinataMeters
+public class Jackpot
 {
-  public bool enabled { get; set; }
-  public MeterCurrentState currentState { get; set; }
+  public bool isTriggered { get; set; }
+  public double amount { get; set; }
 }
 
 [Serializable]
-public class MeterCurrentState
-{
-  [JsonConverter(typeof(BoolOrIntConverter))] public int greenMeter { get; set; }
-  [JsonConverter(typeof(BoolOrIntConverter))] public int redMeter { get; set; }
-  [JsonConverter(typeof(BoolOrIntConverter))] public int blueMeter { get; set; }
-  public int greenThreshold { get; set; }
-  public int redThreshold { get; set; }
-  public int blueThreshold { get; set; }
-}
-
-[Serializable]
-public class SpinPayload
+public class Payload
 {
   public double winAmount { get; set; }
-  public List<WaysWin> waysWins { get; set; }
-  public List<CoinValue> coinWins { get; set; }
-  public MetersUpdate meters { get; set; }
-  public List<TriggeredFeature> triggeredFeatures { get; set; }
-  public List<PendingFeature> pendingFeatures { get; set; }
-  public bool isFreeSpinActive { get; set; }
+  public List<Win> wins { get; set; }
   public int freeSpinsRemaining { get; set; }
-  public bool isRedPinataFreeSpin { get; set; }
-  public bool isBluePinataLinkBonus { get; set; }
-  public bool isBluePinataFreeSpin { get; set; }
-  public List<LinkBonusZone> linkBonusTargetZones { get; set; }
-  public List<LockedCell> linkBonusLockedCells { get; set; }
+  public bool isFreeSpinActive { get; set; }
+  public int freeSpinsAwarded { get; set; }
+  public double totalFreeSpinWin { get; set; }
 }
 
 [Serializable]
-public class WaysWin
+public class Win
 {
-  public int symbolId { get; set; }
-  public string symbolName { get; set; }
-  public int matchCount { get; set; }
+  public int line { get; set; }
   public List<List<int>> positions { get; set; }
-  public double payout { get; set; }
-  public double basePayout { get; set; }
-  public double jackpotPayout { get; set; }
-}
-
-[Serializable]
-public class CoinValue
-{
-  public List<int> position { get; set; }
-  public double value { get; set; }
-}
-
-[Serializable]
-public class MetersUpdate
-{
-  [JsonConverter(typeof(BoolOrIntConverter))] public int greenMeter { get; set; }
-  [JsonConverter(typeof(BoolOrIntConverter))] public int redMeter { get; set; }
-  [JsonConverter(typeof(BoolOrIntConverter))] public int blueMeter { get; set; }
-}
-
-[Serializable]
-public class TriggeredFeature
-{
-  public string feature { get; set; }
-  public bool triggered { get; set; }
-  public double awardValue { get; set; }
-  // wheelBonus
-  public string jackpotTier { get; set; }
-  public List<string> spinHistory { get; set; }
-  // pickJackpot
-  public string goalJackpot { get; set; }
-  // linkBonus
-  public List<LockedCell> lockedCells { get; set; }
-  public int respinsRemaining { get; set; }
-  public bool grandTriggered { get; set; }
-  public double grandBonus { get; set; }
-  public double jackpotBonus { get; set; }
-  public double baseWin { get; set; }
-}
-
-[Serializable]
-public class PendingFeature
-{
-  public string feature { get; set; }
-  public bool triggered { get; set; }
-  public double bet { get; set; }
-}
-
-[Serializable]
-public class LinkBonusZone
-{
-  public List<int> position { get; set; }
-  public int zoneMultiplier { get; set; }
-}
-
-[Serializable]
-public class LockedCell
-{
-  public List<int> position { get; set; }
-  public int zoneMultiplier { get; set; }
+  public double amount { get; set; }
   public string symbolId { get; set; }
-  public double? prizeValue { get; set; }
+  public int multiplier { get; set; }
 }
 
-// ─── Shared Models ───────────────────────────────────────────────────────────
 [Serializable]
 public class UiData
 {
@@ -601,7 +520,7 @@ public class Symbol
 {
   public int id { get; set; }
   public string name { get; set; }
-  public List<double?> multiplier { get; set; }
+  public List<double> multiplier { get; set; }
   public string description { get; set; }
 }
 
@@ -617,19 +536,4 @@ public class AuthTokenData
   public string cookie;
   public string socketURL;
   public string nameSpace;
-}
-
-public class BoolOrIntConverter : JsonConverter<int>
-{
-  public override int ReadJson(JsonReader reader, Type objectType, int existingValue, bool hasExistingValue, JsonSerializer serializer)
-  {
-    if (reader.TokenType == JsonToken.Boolean)
-      return (bool)reader.Value ? 1 : 0;
-    return Convert.ToInt32(reader.Value);
-  }
-
-  public override void WriteJson(JsonWriter writer, int value, JsonSerializer serializer)
-  {
-    writer.WriteValue(value);
-  }
 }
