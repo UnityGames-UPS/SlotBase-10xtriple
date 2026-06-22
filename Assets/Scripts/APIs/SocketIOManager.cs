@@ -445,6 +445,7 @@ public class GameData
 {
   public List<List<int>> lines { get; set; }
   public List<double> bets { get; set; }
+  public int totalLines { get; set; }
 }
 
 [Serializable]
