@@ -55,6 +55,8 @@ public class SlotBehaviour : MonoBehaviour
 
   [Header("Animated Sprites")]
   [SerializeField]
+  private Sprite[] Blank_Sprite;
+  [SerializeField]
   private Sprite[] SingleBar_Sprite;
   [SerializeField]
   private Sprite[] DoubleBar_Sprite;
@@ -139,9 +141,9 @@ public class SlotBehaviour : MonoBehaviour
   internal bool socketConnected = false;
   private int[,] initialMatrix = new int[,]
   {
-    { 0, 1, 2 },
-    { 1, 1, 1 },
-    { 2, 0, 4 }
+    { 1, 2, 3 },
+    { 2, 2, 2 },
+    { 3, 1, 5 }
   };
 
   private void Start()
@@ -275,18 +277,22 @@ public class SlotBehaviour : MonoBehaviour
   private IEnumerator FreeSpinCoroutine(int spinchances)
   {
     yield return new WaitForSecondsRealtime(1.5f);
-    int i = 0;
-    int remainingSpins = spinchances;
-    while (i < spinchances)
+    if (FSnum_text) FSnum_text.text = spinchances.ToString();
+    bool isFreeSpinActive;
+    do
     {
-      remainingSpins--;
-      if (FSnum_text) FSnum_text.text = remainingSpins.ToString();
       StartSlots();
       yield return tweenroutine;
       yield return new WaitForSeconds(SpinDelay);
-      i++;
-    }
+      isFreeSpinActive = SocketManager.ResultData.payload.isFreeSpinActive;
+      if (FSnum_text) FSnum_text.text = SocketManager.ResultData.payload.freeSpinsRemaining.ToString();
+    } while (isFreeSpinActive);
     if (FSBoard_Object) FSBoard_Object.SetActive(false);
+
+    double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
+    StartCoroutine(uiManager.ShowSpinWin(totalFreeSpinWin));
+    StartCoroutine(uiManager.ShowBonusWinSequence(totalFreeSpinWin, currentTotalBet));
+
     if (WasAutoSpinOn)
     {
       AutoSpin();
@@ -441,69 +447,76 @@ public class SlotBehaviour : MonoBehaviour
     switch (val)
     {
       case 0:
+        for (int i = 0; i < Blank_Sprite.Length; i++)
+        {
+          animScript.textureArray.Add(Blank_Sprite[i]);
+        }
+        animScript.AnimationSpeed = 12f;
+        break;
+      case 1:
         for (int i = 0; i < SingleBar_Sprite.Length; i++)
         {
           animScript.textureArray.Add(SingleBar_Sprite[i]);
         }
         animScript.AnimationSpeed = 12f;
         break;
-      case 1:
+      case 2:
         for (int i = 0; i < DoubleBar_Sprite.Length; i++)
         {
           animScript.textureArray.Add(DoubleBar_Sprite[i]);
         }
         animScript.AnimationSpeed = 12f;
         break;
-      case 2:
+      case 3:
         for (int i = 0; i < TripleBar_Sprite.Length; i++)
         {
           animScript.textureArray.Add(TripleBar_Sprite[i]);
         }
         animScript.AnimationSpeed = 12f;
         break;
-      case 3:
+      case 4:
         for (int i = 0; i < Bell_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Bell_Sprite[i]);
         }
         animScript.AnimationSpeed = 12f;
         break;
-      case 4:
+      case 5:
         for (int i = 0; i < Red7_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Red7_Sprite[i]);
         }
         animScript.AnimationSpeed = 12f;
         break;
-      case 5:
+      case 6:
         for (int i = 0; i < Wild2x_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Wild2x_Sprite[i]);
         }
         animScript.AnimationSpeed = 30f;
         break;
-      case 6:
+      case 7:
         for (int i = 0; i < Wild3x_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Wild3x_Sprite[i]);
         }
         animScript.AnimationSpeed = 30f;
         break;
-      case 7:
+      case 8:
         for (int i = 0; i < Wild5x_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Wild5x_Sprite[i]);
         }
         animScript.AnimationSpeed = 30f;
         break;
-      case 8:
+      case 9:
         for (int i = 0; i < Wild10x_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Wild10x_Sprite[i]);
         }
         animScript.AnimationSpeed = 30f;
         break;
-      case 9:
+      case 10:
         for (int i = 0; i < Scatter_Sprite.Length; i++)
         {
           animScript.textureArray.Add(Scatter_Sprite[i]);
@@ -585,8 +598,6 @@ public class SlotBehaviour : MonoBehaviour
         Tempimages[j].slotImages[i].sprite = myImages[resultNum];
       }
     }
-    CheckForFeaturesAnimation();
-
 
     if (IsTurboOn || IsFreeSpin)
     {
@@ -613,6 +624,14 @@ public class SlotBehaviour : MonoBehaviour
     yield return alltweens[^1].WaitForCompletion();
     KillAllTweens();
 
+    for (int i = 0; i < 3; i++)
+    {
+      for (int j = 0; j < numberOfSlots; j++)
+      {
+        StartGameAnimation(Tempimages[j].slotImages[i].gameObject);
+      }
+    }
+
     if (SocketManager.ResultData.payload.winAmount > 0)
     {
       SpinDelay = 1.2f;
@@ -629,7 +648,7 @@ public class SlotBehaviour : MonoBehaviour
       {
         winLine.Add(item.line);
       }
-      CheckPayoutLineBackend(winLine);
+      CheckPayoutLineBackend(winLine, SocketManager.ResultData.features.jackpot.amount);
     }
 
     CheckPopups = true;
@@ -640,8 +659,12 @@ public class SlotBehaviour : MonoBehaviour
 
     currentBalance = SocketManager.PlayerData.balance;
 
+    StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
+    StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
+
     if (SocketManager.ResultData.features.jackpot.isTriggered)
     {
+      if (audioController) audioController.PlayJackpotWin();
       CheckPopups = false;
       yield return new WaitUntil(() => !CheckPopups);
       CheckPopups = true;
@@ -677,34 +700,6 @@ public class SlotBehaviour : MonoBehaviour
         WasAutoSpinOn = true;
         StopAutoSpin();
         yield return new WaitForSeconds(0.1f);
-      }
-    }
-  }
-  private void CheckForFeaturesAnimation()
-  {
-    bool playJackpot = SocketManager.ResultData.features.jackpot.amount > 0;
-    bool playFreespin = SocketManager.ResultData.features.freeSpin.isFreeSpin;
-    PlayFeatureAnimation(playJackpot, playFreespin);
-  }
-  private void PlayFeatureAnimation(bool jackpot = false, bool freeSpin = false)
-  {
-    for (int i = 0; i < SocketManager.ResultData.matrix.Count; i++)
-    {
-      for (int j = 0; j < SocketManager.ResultData.matrix[i].Count; j++)
-      {
-
-        if (int.TryParse(SocketManager.ResultData.matrix[i][j], out int parsedNumber))
-        {
-          if (jackpot && parsedNumber == 8)
-          {
-            StartGameAnimation(Tempimages[j].slotImages[i].gameObject);
-          }
-          if (freeSpin && parsedNumber == 9)
-          {
-            StartGameAnimation(Tempimages[j].slotImages[i].gameObject);
-          }
-        }
-
       }
     }
   }

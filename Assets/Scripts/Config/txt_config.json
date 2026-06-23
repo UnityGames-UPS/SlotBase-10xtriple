@@ -17,6 +17,14 @@
   "symbols": [
     {
       "id": 0,
+      "name": "Blank",
+      "multiplier": [0],
+      "useWildSub": false,
+      "isBonusSymbol": false,
+      "reelsInstance": { "0": 5, "1": 5, "2": 5 }
+    },
+    {
+      "id": 1,
       "name": "Single BAR",
       "multiplier": [0.5],
       "useWildSub": true,
@@ -24,7 +32,7 @@
       "reelsInstance": { "0": 25, "1": 25, "2": 25 }
     },
     {
-      "id": 1,
+      "id": 2,
       "name": "Double BAR",
       "multiplier": [1],
       "useWildSub": true,
@@ -32,7 +40,7 @@
       "reelsInstance": { "0": 25, "1": 25, "2": 25 }
     },
     {
-      "id": 2,
+      "id": 3,
       "name": "Triple BAR",
       "multiplier": [3],
       "useWildSub": true,
@@ -40,7 +48,7 @@
       "reelsInstance": { "0": 15, "1": 15, "2": 15 }
     },
     {
-      "id": 3,
+      "id": 4,
       "name": "Bell",
       "multiplier": [6],
       "useWildSub": true,
@@ -48,7 +56,7 @@
       "reelsInstance": { "0": 14, "1": 14, "2": 14 }
     },
     {
-      "id": 4,
+      "id": 5,
       "name": "Red 7",
       "multiplier": [8],
       "useWildSub": true,
@@ -56,7 +64,7 @@
       "reelsInstance": { "0": 12, "1": 12, "2": 12 }
     },
     {
-      "id": 5,
+      "id": 6,
       "name": "2x Wild",
       "isWild": true,
       "multiplier": [25],
@@ -66,7 +74,7 @@
       "wildMultiplier": 2
     },
     {
-      "id": 6,
+      "id": 7,
       "name": "3x Wild",
       "isWild": true,
       "multiplier": [75],
@@ -76,7 +84,7 @@
       "wildMultiplier": 3
     },
     {
-      "id": 7,
+      "id": 8,
       "name": "5x Wild",
       "isWild": true,
       "multiplier": [150],
@@ -86,7 +94,7 @@
       "wildMultiplier": 5
     },
     {
-      "id": 8,
+      "id": 9,
       "name": "10x Wild",
       "isWild": true,
       "multiplier": [0],
@@ -97,7 +105,7 @@
       "isGrandJackpotTrigger": true
     },
     {
-      "id": 9,
+      "id": 10,
       "name": "Scatter",
       "multiplier": [0],
       "useWildSub": false,
@@ -112,14 +120,14 @@
       "value": 20,
       "enabled": true,
       "scaleWithBet": false,
-      "triggerSymbolId": 8
+      "triggerSymbolId": 9
     },
     "freeSpins": {
       "enabled": true,
       "spinCount": 7,
       "replaceReelIndex": 1,
       "triggerScatterCount": 3,
-      "specialReelSymbolsOnly": [5, 6, 7, 8]
+      "specialReelSymbolsOnly": [6, 7, 8, 9]
     },
     "wildRules": {
       "mixedWildPayouts": [
