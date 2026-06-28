@@ -38,6 +38,16 @@ public class UIManager : MonoBehaviour
   [Header("Intro")]
   [SerializeField] private RectTransform GameContent;
 
+  [Header("Free Spin Trigger Sequence")]
+  [SerializeField] private GameObject DarkenOverlay;
+  [SerializeField] private GameObject FreeSpinsTriggerText;
+  [SerializeField] private GameObject MainLogo;
+  [SerializeField] private GameObject FreeSpinsLogoDisplay;
+  [SerializeField] private TMP_Text FreeSpinsLogoCountText;
+  [SerializeField] private TMP_Text FreeSpinsAwardedText;
+  [SerializeField] private float freeSpinsPopupScaleDuration = 0.4f;
+  [SerializeField] private float freeSpinsPopupHoldDuration = 1.5f;
+
   [Header("Bonus Win Sequence")]
   [SerializeField] private GameObject BonusWinSequencePanel;
   [SerializeField] private ImageAnimation BonusWinCoinFallingAnim;
@@ -47,6 +57,7 @@ public class UIManager : MonoBehaviour
   [SerializeField] private Sprite BigWinTierSprite;
   [SerializeField] private Sprite MegaWinTierSprite;
   [SerializeField] private Sprite SuperWinTierSprite;
+  [SerializeField] private float bonusWinShowDelay = 1f;
   [SerializeField] private float bonusWinScaleDuration = 0.4f;
   [SerializeField] private float bonusWinCountDuration = 1.5f;
   [SerializeField] private float bonusWinHoldDuration = 2f;
@@ -418,6 +429,35 @@ public class UIManager : MonoBehaviour
     if (TotalWin_text) TotalWin_text.text = "0.000";
   }
 
+  internal IEnumerator PlayFreeSpinTriggerSequence(int spinCount)
+  {
+    if (DarkenOverlay) DarkenOverlay.SetActive(true);
+    if (FreeSpinsTriggerText) FreeSpinsTriggerText.SetActive(true);
+
+    if (FreeSpinsAwardedText)
+    {
+      FreeSpinsAwardedText.text = spinCount.ToString();
+      FreeSpinsAwardedText.gameObject.SetActive(true);
+      FreeSpinsAwardedText.transform.localScale = Vector3.zero;
+      yield return FreeSpinsAwardedText.transform.DOScale(Vector3.one, freeSpinsPopupScaleDuration).SetEase(Ease.OutBack).WaitForCompletion();
+    }
+
+    yield return new WaitForSeconds(freeSpinsPopupHoldDuration);
+
+    if (FreeSpinsAwardedText) FreeSpinsAwardedText.gameObject.SetActive(false);
+    if (MainLogo) MainLogo.SetActive(false);
+    if (FreeSpinsLogoCountText) FreeSpinsLogoCountText.text = spinCount.ToString();
+    if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(true);
+    if (DarkenOverlay) DarkenOverlay.SetActive(false);
+    if (FreeSpinsTriggerText) FreeSpinsTriggerText.SetActive(false);
+  }
+
+  internal void EndFreeSpinTriggerSequence()
+  {
+    if (MainLogo) MainLogo.SetActive(true);
+    if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(false);
+  }
+
   internal IEnumerator ShowSpinWin(double winAmount)
   {
     if (winAmount <= 0) yield break;
@@ -526,6 +566,8 @@ public class UIManager : MonoBehaviour
   {
     string tier = GetBonusWinTier(totalWin, bet);
     if (tier == null) yield break;
+
+    yield return new WaitForSeconds(bonusWinShowDelay);
 
     if (BonusNameGraphicImage) BonusNameGraphicImage.sprite = GetBonusWinTierSprite(tier);
     if (BonusWinPanel) BonusWinPanel.localScale = Vector3.zero;

@@ -4,15 +4,15 @@
     0.01, 0.02, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.5, 1, 2, 5
   ],
   "lines": [
-    [1, 1, 1],
-    [0, 0, 0],
     [2, 2, 2],
-    [0, 1, 2],
-    [2, 1, 0]
+    [1, 1, 1],
+    [3, 3, 3],
+    [1, 2, 3],
+    [3, 2, 1]
   ],
   "matrix": {
     "x": 3,
-    "y": 3
+    "y": 5
   },
   "symbols": [
     {
@@ -29,7 +29,7 @@
       "multiplier": [0.5],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 25, "1": 25, "2": 25 }
+      "reelsInstance": { "0": 14, "1": 16, "2": 15 }
     },
     {
       "id": 2,
@@ -37,7 +37,7 @@
       "multiplier": [1],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 25, "1": 25, "2": 25 }
+      "reelsInstance": { "0": 16, "1": 16, "2": 16 }
     },
     {
       "id": 3,
@@ -45,7 +45,7 @@
       "multiplier": [3],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 15, "1": 15, "2": 15 }
+      "reelsInstance": { "0": 16, "1": 16, "2": 16 }
     },
     {
       "id": 4,
@@ -53,7 +53,7 @@
       "multiplier": [6],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 14, "1": 14, "2": 14 }
+      "reelsInstance": { "0": 17, "1": 17, "2": 17 }
     },
     {
       "id": 5,
@@ -61,7 +61,7 @@
       "multiplier": [8],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 12, "1": 12, "2": 12 }
+      "reelsInstance": { "0": 16, "1": 16, "2": 16 }
     },
     {
       "id": 6,
@@ -70,7 +70,7 @@
       "multiplier": [25],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 3, "1": 3, "2": 3 },
+      "reelsInstance": { "0": 7, "1": 6, "2": 7 },
       "wildMultiplier": 2
     },
     {
@@ -80,7 +80,7 @@
       "multiplier": [75],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "reelsInstance": { "0": 4, "1": 4, "2": 4 },
       "wildMultiplier": 3
     },
     {
@@ -90,7 +90,7 @@
       "multiplier": [150],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "reelsInstance": { "0": 2, "1": 2, "2": 2 },
       "wildMultiplier": 5
     },
     {
@@ -100,7 +100,7 @@
       "multiplier": [0],
       "useWildSub": true,
       "isBonusSymbol": false,
-      "reelsInstance": { "0": 1, "1": 1, "2": 1 },
+      "reelsInstance": { "0": 2, "1": 2, "2": 2 },
       "wildMultiplier": 10,
       "isGrandJackpotTrigger": true
     },
@@ -110,7 +110,7 @@
       "multiplier": [0],
       "useWildSub": false,
       "isBonusSymbol": true,
-      "reelsInstance": { "0": 3, "1": 3, "2": 3 }
+      "reelsInstance": { "0": 6, "1": 5, "2": 5 }
     }
   ],
   "features": {

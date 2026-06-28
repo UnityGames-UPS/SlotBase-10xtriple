@@ -58,6 +58,7 @@ public class ImageAnimation : MonoBehaviour
 
 	public void StartAnimation()
 	{
+		if (textureArray == null || textureArray.Count == 0) return;
 		if (_animRoutine != null)
 		{
 			StopCoroutine(_animRoutine);

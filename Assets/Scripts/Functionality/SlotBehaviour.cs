@@ -30,7 +30,11 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField]
   private List<TMP_Text> StaticLine_Texts;
 
-  private Dictionary<int, string> y_string = new Dictionary<int, string>();
+  [Header("Payline Graphics")]
+  [SerializeField]
+  private List<GameObject> PaylineGraphics;
+
+  private int _hoverLineIndex = -1;
 
   [Header("Buttons")]
   [SerializeField]
@@ -95,13 +99,25 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField]
   private TMP_Text FSnum_text;
 
+  [Header("Free Spin Trigger Anticipation")]
+  [SerializeField] private Camera anticipationCamera;
+  [SerializeField] private float anticipationStopDuration = 1.5f;
+  [SerializeField] private float anticipationZoomAmount = 0.8f;
+  [SerializeField] private float anticipationZoomInDuration = 0.6f;
+  [SerializeField] private float anticipationZoomOutDuration = 0.9f;
+
+  [Header("Free Spin Special Reel")]
+  [SerializeField] private GameObject SpecialReelObject;
+  [SerializeField] private Transform SpecialReelTransform;
+  [SerializeField] private float specialReelSpeedMultiplier = 0.4f;
+  [SerializeField] private float specialReelDuration = 2f;
+  [SerializeField] private GameObject MiddleReelGlow;
+
   int tweenHeight = 0;  //calculate the height at which tweening is done
 
   [SerializeField]
   private GameObject Image_Prefab;    //icons prefab
   [SerializeField] Sprite[] TurboToggleSprites;
-  [SerializeField]
-  private PayoutCalculation PayCalculator;
 
   private List<Tweener> alltweens = new List<Tweener>();
 
@@ -127,6 +143,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField]
   private int IconSizeFactor = 100;       //set this parameter according to the size of the icon and spacing
   private int numberOfSlots = 3;          //number of columns
+  private int numberOfRows = 5;           //number of rows per column (3 real + 2 decorative edge rows)
   private bool StopSpinToggle;
   private float SpinDelay = 0.2f;
   private bool IsTurboOn;
@@ -134,8 +151,10 @@ public class SlotBehaviour : MonoBehaviour
   internal bool socketConnected = false;
   private int[,] initialMatrix = new int[,]
   {
-    { 4, 4, 4 },
+    { 4, 4, 5 },
+    { 0, 0, 0 },
     { 10, 10, 10 },
+    { 0, 0, 0 },
     { 3, 3, 3 }
   };
 
@@ -279,6 +298,8 @@ public class SlotBehaviour : MonoBehaviour
       if (FSnum_text) FSnum_text.text = SocketManager.ResultData.payload.freeSpinsRemaining.ToString();
     } while (isFreeSpinActive);
     if (FSBoard_Object) FSBoard_Object.SetActive(false);
+    if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
+    uiManager.EndFreeSpinTriggerSequence();
 
     double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
     StartCoroutine(uiManager.ShowSpinWin(totalFreeSpinWin));
@@ -308,7 +329,6 @@ public class SlotBehaviour : MonoBehaviour
   //Fetch Lines from backend
   internal void FetchLines(string LineVal, int count)
   {
-    y_string.Add(count + 1, LineVal);
     if (StaticLine_Texts.Count > count) StaticLine_Texts[count].text = (count + 1).ToString();
     if (StaticLine_Objects.Count > count) StaticLine_Objects[count].SetActive(true);
   }
@@ -326,15 +346,23 @@ public class SlotBehaviour : MonoBehaviour
     {
       Debug.Log("Exception while parsing " + e.Message);
     }
-    List<int> y_points = null;
-    y_points = y_string[LineID]?.Split(',')?.Select(Int32.Parse)?.ToList();
-    if (PayCalculator) PayCalculator.GeneratePayoutLinesBackend(y_points, y_points.Count, true);
+    int index = LineID - 1;
+    if (PaylineGraphics.Count > index)
+    {
+      PaylineGraphics[index].SetActive(true);
+      StartGameAnimation(PaylineGraphics[index]);
+      _hoverLineIndex = index;
+    }
   }
 
   //Destroy Static Lines from button hovers
   internal void DestroyStaticLine()
   {
-    if (PayCalculator) PayCalculator.ResetStaticLine();
+    if (_hoverLineIndex >= 0 && PaylineGraphics.Count > _hoverLineIndex)
+    {
+      PaylineGraphics[_hoverLineIndex].SetActive(false);
+    }
+    _hoverLineIndex = -1;
   }
   #endregion
 
@@ -537,7 +565,7 @@ public class SlotBehaviour : MonoBehaviour
   private void StartSlots(bool autoSpin = false)
   {
 
-    if (TotalWin_text) TotalWin_text.text = "0.000";
+    if (TotalWin_text && !IsFreeSpin) TotalWin_text.text = "0.000";
 
     if (!autoSpin)
     {
@@ -553,7 +581,10 @@ public class SlotBehaviour : MonoBehaviour
     {
       StopGameAnimation();
     }
-    if (PayCalculator) PayCalculator.ResetLines();
+    for (int i = 0; i < PaylineGraphics.Count; i++)
+    {
+      PaylineGraphics[i].SetActive(false);
+    }
     tweenroutine = StartCoroutine(TweenRoutine());
   }
 
@@ -588,7 +619,7 @@ public class SlotBehaviour : MonoBehaviour
     SocketManager.AccumulateResult(BetCounter);
     yield return new WaitUntil(() => SocketManager.isResultdone);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < numberOfRows; i++)
     {
       for (int j = 0; j < numberOfSlots; j++)
       {
@@ -602,6 +633,14 @@ public class SlotBehaviour : MonoBehaviour
         }
         TempImages[j].slotImages[i].sprite = myImages[resultNum];
       }
+    }
+
+    for (int j = 0; j < numberOfSlots; j++)
+    {
+      bool isCaseA = int.Parse(SocketManager.ResultData.matrix[0][j]) != 0;
+      float edgeRotation = isCaseA ? 50f : 10f;
+      TempImages[j].slotImages[0].rectTransform.localEulerAngles = new Vector3(edgeRotation, 0, 0);
+      TempImages[j].slotImages[numberOfRows - 1].rectTransform.localEulerAngles = new Vector3(-edgeRotation, 0, 0);
     }
 
     if (IsTurboOn || IsFreeSpin)
@@ -620,9 +659,19 @@ public class SlotBehaviour : MonoBehaviour
       }
     }
 
+    bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin;
     for (int i = 0; i < numberOfSlots; i++)
     {
-      yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
+      bool isLastReel = i == numberOfSlots - 1;
+      if (willTriggerFreeSpin && isLastReel)
+      {
+        StartCoroutine(AnticipationZoom());
+        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle, anticipationStopDuration);
+      }
+      else
+      {
+        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
+      }
     }
     StopSpinToggle = false;
     yield return alltweens[^1].WaitForCompletion();
@@ -635,7 +684,7 @@ public class SlotBehaviour : MonoBehaviour
 
     KillAllTweens();
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < numberOfRows; i++)
     {
       for (int j = 0; j < numberOfSlots; j++)
       {
@@ -664,14 +713,21 @@ public class SlotBehaviour : MonoBehaviour
 
     CheckPopups = true;
 
-    if (TotalWin_text) TotalWin_text.text = SocketManager.ResultData.payload.winAmount.ToString("F3");
+    if (TotalWin_text)
+    {
+      double displayWin = IsFreeSpin ? SocketManager.ResultData.payload.totalFreeSpinWin : SocketManager.ResultData.payload.winAmount;
+      TotalWin_text.text = displayWin.ToString("F3");
+    }
     BalanceTween?.Kill();
     if (Balance_text) Balance_text.text = SocketManager.ResultData.player.balance.ToString("F3");
 
     currentBalance = SocketManager.PlayerData.balance;
 
     StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
-    StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
+    if (IsFreeSpin)
+    {
+      StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
+    }
 
     if (SocketManager.ResultData.features.jackpot.isTriggered)
     {
@@ -705,6 +761,9 @@ public class SlotBehaviour : MonoBehaviour
           FreeSpinRoutine = null;
         }
       }
+      yield return StartCoroutine(uiManager.PlayFreeSpinTriggerSequence(SocketManager.ResultData.features.freeSpin.count));
+      if (MiddleReelGlow) MiddleReelGlow.SetActive(true);
+      yield return StartCoroutine(PlaySpecialWildReel());
       FreeSpin(SocketManager.ResultData.features.freeSpin.count);
       if (IsAutoSpin)
       {
@@ -753,13 +812,15 @@ public class SlotBehaviour : MonoBehaviour
   //generate the payout lines generated
   private void CheckPayoutLineBackend(List<int> LineId, double jackpot = 0)
   {
-    List<int> y_points = null;
     if (LineId.Count > 0)
     {
       for (int i = 0; i < LineId.Count; i++)
       {
-        y_points = y_string[LineId[i] + 1]?.Split(',')?.Select(Int32.Parse)?.ToList();
-        if (PayCalculator) PayCalculator.GeneratePayoutLinesBackend(y_points, y_points.Count);
+        if (PaylineGraphics.Count > LineId[i])
+        {
+          PaylineGraphics[LineId[i]].SetActive(true);
+          StartGameAnimation(PaylineGraphics[LineId[i]]);
+        }
       }
 
       if (jackpot > 0)
@@ -844,15 +905,26 @@ public class SlotBehaviour : MonoBehaviour
     alltweens.Add(tweener);
   }
 
+  private IEnumerator PlaySpecialWildReel()
+  {
+    if (!SpecialReelObject || !SpecialReelTransform) yield break;
+    SpecialReelObject.SetActive(true);
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, 0);
+    Tweener specialTween = SpecialReelTransform.DOLocalMoveY(-tweenHeight, 0.2f / specialReelSpeedMultiplier).SetLoops(-1, LoopType.Restart);
+    yield return new WaitForSeconds(specialReelDuration);
+    specialTween.Kill();
+    SpecialReelObject.SetActive(false);
+  }
 
 
-  private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop)
+
+  private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
   {
     alltweens[index].Kill();
     // int tweenpos = (reqpos * IconSizeFactor) - IconSizeFactor;
     slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
     // TODO: hardcoded landing Y for now, was -tweenpos + 100 (the old IconSizeFactor-based formula). Needs tweaking and should eventually be made dynamic again instead of a fixed magic number.
-    alltweens[index] = slotTransform.DOLocalMoveY(3393.2f, 0.5f).SetEase(Ease.OutElastic);
+    alltweens[index] = slotTransform.DOLocalMoveY(3393.2f, duration).SetEase(Ease.OutElastic);
     if (!isStop)
     {
       yield return new WaitForSeconds(0.2f);
@@ -860,6 +932,23 @@ public class SlotBehaviour : MonoBehaviour
     else
     {
       yield return null;
+    }
+  }
+
+  private IEnumerator AnticipationZoom()
+  {
+    if (!anticipationCamera) yield break;
+    if (anticipationCamera.orthographic)
+    {
+      float original = anticipationCamera.orthographicSize;
+      yield return anticipationCamera.DOOrthoSize(original * anticipationZoomAmount, anticipationZoomInDuration).SetEase(Ease.OutSine).WaitForCompletion();
+      yield return anticipationCamera.DOOrthoSize(original, anticipationZoomOutDuration).SetEase(Ease.OutElastic).WaitForCompletion();
+    }
+    else
+    {
+      float original = anticipationCamera.fieldOfView;
+      yield return anticipationCamera.DOFieldOfView(original * anticipationZoomAmount, anticipationZoomInDuration).SetEase(Ease.OutSine).WaitForCompletion();
+      yield return anticipationCamera.DOFieldOfView(original, anticipationZoomOutDuration).SetEase(Ease.OutElastic).WaitForCompletion();
     }
   }
 
