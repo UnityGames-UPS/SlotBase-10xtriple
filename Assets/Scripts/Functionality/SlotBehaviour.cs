@@ -48,7 +48,6 @@ public class SlotBehaviour : MonoBehaviour
   private Button TBetPlus_Button;
   [SerializeField]
   private Button TBetMinus_Button;
-  [SerializeField] private Button Turbo_Button;
   [SerializeField] private Sprite SpinSprite;
   [SerializeField] private Sprite StopSprite;
 
@@ -111,7 +110,6 @@ public class SlotBehaviour : MonoBehaviour
 
   [SerializeField]
   private GameObject Image_Prefab;    //icons prefab
-  [SerializeField] Sprite[] TurboToggleSprites;
 
   private List<Tweener> alltweens = new List<Tweener>();
 
@@ -140,8 +138,9 @@ public class SlotBehaviour : MonoBehaviour
   private int numberOfRows = 5;           //number of rows per column (3 real + 2 decorative edge rows)
   private bool StopSpinToggle;
   private float SpinDelay = 0.2f;
-  private bool IsTurboOn;
+  private float minSpinDuration = 1.5f;
   internal bool WasAutoSpinOn;
+  private bool _isFirstFreeSpin;
   internal bool socketConnected = false;
   private int[,] initialMatrix = new int[,]
   {
@@ -172,31 +171,10 @@ public class SlotBehaviour : MonoBehaviour
     if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
     if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
 
-    if (Turbo_Button) Turbo_Button.onClick.RemoveAllListeners();
-    if (Turbo_Button) Turbo_Button.onClick.AddListener(TurboToggle);
-
     if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
     if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
 
     tweenHeight = (15 * IconSizeFactor) - 280;
-  }
-
-  void TurboToggle()
-  {
-    audioController.PlayButton();
-    if (IsTurboOn)
-    {
-      IsTurboOn = false;
-      Turbo_Button.GetComponent<ImageAnimation>().StopAnimation();
-      Turbo_Button.image.sprite = TurboToggleSprites[0];
-      Turbo_Button.image.color = new Color(0.86f, 0.86f, 0.86f, 1);
-    }
-    else
-    {
-      IsTurboOn = true;
-      Turbo_Button.GetComponent<ImageAnimation>().StartAnimation();
-      Turbo_Button.image.color = new Color(1, 1, 1, 1);
-    }
   }
 
   #region Autospin
@@ -280,13 +258,16 @@ public class SlotBehaviour : MonoBehaviour
     yield return new WaitForSecondsRealtime(1.5f);
     uiManager.UpdateFreeSpinsRemaining(spinchances);
     bool isFreeSpinActive;
+    bool isFirstFreeSpin = true;
     do
     {
+      _isFirstFreeSpin = isFirstFreeSpin;
       StartSlots();
       yield return tweenroutine;
       yield return new WaitForSeconds(SpinDelay);
       isFreeSpinActive = SocketManager.ResultData.payload.isFreeSpinActive;
       uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
+      isFirstFreeSpin = false;
     } while (isFreeSpinActive);
     if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
     uiManager.EndFreeSpinTriggerSequence();
@@ -595,10 +576,26 @@ public class SlotBehaviour : MonoBehaviour
 
     ToggleButtonGrp(false);
     if (Spin_Button) Spin_Button.GetComponent<Image>().sprite = StopSprite;
-    for (int i = 0; i < numberOfSlots; i++)
+    float spinStartTime = Time.time;
+    if (IsFreeSpin && _isFirstFreeSpin)
     {
-      InitializeTweening(Slot_Transform[i]);
-      yield return new WaitForSeconds(0.1f);
+      InitializeTweening(Slot_Transform[1]);
+      yield return new WaitForSeconds(1.25f);
+      InitializeTweening(Slot_Transform[0]);
+      InitializeTweening(Slot_Transform[2]);
+    }
+    else if (IsFreeSpin)
+    {
+      for (int i = 0; i < numberOfSlots; i++)
+        InitializeTweening(Slot_Transform[i]);
+    }
+    else
+    {
+      for (int i = 0; i < numberOfSlots; i++)
+      {
+        InitializeTweening(Slot_Transform[i]);
+        yield return new WaitForSeconds(0.1f);
+      }
     }
 
     if (!IsFreeSpin)
@@ -633,23 +630,20 @@ public class SlotBehaviour : MonoBehaviour
       TempImages[j].slotImages[numberOfRows - 1].rectTransform.localEulerAngles = new Vector3(-edgeRotation, 0, 0);
     }
 
-    if (IsTurboOn || IsFreeSpin)
+    float spinElapsed = Time.time - spinStartTime;
+    if (spinElapsed < minSpinDuration)
+      yield return new WaitForSeconds(minSpinDuration - spinElapsed);
+
+    for (int i = 0; i < 5; i++)
     {
-      StopSpinToggle = true;
-    }
-    else
-    {
-      for (int i = 0; i < 5; i++)
+      yield return null;
+      if (StopSpinToggle)
       {
-        yield return null;
-        if (StopSpinToggle)
-        {
-          break;
-        }
+        break;
       }
     }
 
-    bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin;
+    bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin && !IsFreeSpin;
     for (int i = 0; i < numberOfSlots; i++)
     {
       bool isLastReel = i == numberOfSlots - 1;
@@ -682,7 +676,7 @@ public class SlotBehaviour : MonoBehaviour
       }
     }
 
-    if (SocketManager.ResultData.payload.winAmount > 0)
+    if (!IsFreeSpin && SocketManager.ResultData.payload.winAmount > 0)
     {
       SpinDelay = 1.2f;
     }
@@ -713,10 +707,14 @@ public class SlotBehaviour : MonoBehaviour
 
     currentBalance = SocketManager.PlayerData.balance;
 
-    StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
     if (IsFreeSpin)
     {
-      StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
+      yield return StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
+      yield return StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
+    }
+    else
+    {
+      StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
     }
 
     if (SocketManager.ResultData.features.jackpot.isTriggered)
@@ -740,17 +738,8 @@ public class SlotBehaviour : MonoBehaviour
       // yield return new WaitForSeconds(2f);
       IsSpinning = false;
     }
-    if (SocketManager.ResultData.features.freeSpin.isFreeSpin)
+    if (willTriggerFreeSpin)
     {
-      if (IsFreeSpin)
-      {
-        IsFreeSpin = false;
-        if (FreeSpinRoutine != null)
-        {
-          StopCoroutine(FreeSpinRoutine);
-          FreeSpinRoutine = null;
-        }
-      }
       yield return StartCoroutine(uiManager.PlayFreeSpinTriggerSequence(SocketManager.ResultData.features.freeSpin.count));
       if (MiddleReelGlow) MiddleReelGlow.SetActive(true);
       yield return StartCoroutine(PlaySpecialWildReel());
@@ -862,7 +851,6 @@ public class SlotBehaviour : MonoBehaviour
     if (MaxBet_Button) MaxBet_Button.interactable = active;
     if (TBetMinus_Button) TBetMinus_Button.interactable = active;
     if (TBetPlus_Button) TBetPlus_Button.interactable = active;
-    // if(Turbo_Button) Turbo_Button.interactable = toggle;
   }
 
   //start the icons animation
