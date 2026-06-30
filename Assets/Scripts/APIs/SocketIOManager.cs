@@ -27,7 +27,7 @@ public class SocketIOManager : MonoBehaviour
   protected string TestSocketURI = "https://devrealtime.dingdinghouse.com";
   protected string nameSpace = "playground";
   private Socket gameSocket;
-  protected string gameID = "SL-VIK";
+  protected string gameID = "SL-TXT";
   //protected string gameID = "";
   private const int maxReconnectionAttempts = 6;
   private readonly TimeSpan reconnectionDelay = TimeSpan.FromSeconds(10);

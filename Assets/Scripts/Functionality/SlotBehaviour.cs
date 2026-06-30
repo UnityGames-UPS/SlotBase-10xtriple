@@ -93,12 +93,6 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField]
   private UIManager uiManager;
 
-  [Header("Free Spins Board")]
-  [SerializeField]
-  private GameObject FSBoard_Object;
-  [SerializeField]
-  private TMP_Text FSnum_text;
-
   [Header("Free Spin Trigger Anticipation")]
   [SerializeField] private Camera anticipationCamera;
   [SerializeField] private float anticipationStopDuration = 1.5f;
@@ -184,8 +178,6 @@ public class SlotBehaviour : MonoBehaviour
     if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
     if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
 
-    if (FSBoard_Object) FSBoard_Object.SetActive(false);
-
     tweenHeight = (15 * IconSizeFactor) - 280;
   }
 
@@ -270,8 +262,7 @@ public class SlotBehaviour : MonoBehaviour
   {
     if (!IsFreeSpin)
     {
-      if (FSnum_text) FSnum_text.text = spins.ToString();
-      if (FSBoard_Object) FSBoard_Object.SetActive(true);
+      uiManager.UpdateFreeSpinsRemaining(spins);
       IsFreeSpin = true;
       ToggleButtonGrp(false);
 
@@ -287,7 +278,7 @@ public class SlotBehaviour : MonoBehaviour
   private IEnumerator FreeSpinCoroutine(int spinchances)
   {
     yield return new WaitForSecondsRealtime(1.5f);
-    if (FSnum_text) FSnum_text.text = spinchances.ToString();
+    uiManager.UpdateFreeSpinsRemaining(spinchances);
     bool isFreeSpinActive;
     do
     {
@@ -295,9 +286,8 @@ public class SlotBehaviour : MonoBehaviour
       yield return tweenroutine;
       yield return new WaitForSeconds(SpinDelay);
       isFreeSpinActive = SocketManager.ResultData.payload.isFreeSpinActive;
-      if (FSnum_text) FSnum_text.text = SocketManager.ResultData.payload.freeSpinsRemaining.ToString();
+      uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
     } while (isFreeSpinActive);
-    if (FSBoard_Object) FSBoard_Object.SetActive(false);
     if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
     uiManager.EndFreeSpinTriggerSequence();
 

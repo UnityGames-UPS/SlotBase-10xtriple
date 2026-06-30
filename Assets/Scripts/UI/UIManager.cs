@@ -289,6 +289,8 @@ public class UIManager : MonoBehaviour
 
     if (Music_Button) Music_Button.onClick.RemoveAllListeners();
     if (Music_Button) Music_Button.onClick.AddListener(ToggleMusic);
+
+    if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(false);
   }
 
   private IEnumerator PlayIntro()
@@ -456,6 +458,11 @@ public class UIManager : MonoBehaviour
   {
     if (MainLogo) MainLogo.SetActive(true);
     if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(false);
+  }
+
+  internal void UpdateFreeSpinsRemaining(int remaining)
+  {
+    if (FreeSpinsLogoCountText) FreeSpinsLogoCountText.text = remaining.ToString();
   }
 
   internal IEnumerator ShowSpinWin(double winAmount)
