@@ -102,16 +102,21 @@ public class SlotBehaviour : MonoBehaviour
   [Header("Free Spin Special Reel")]
   [SerializeField] private GameObject SpecialReelObject;
   [SerializeField] private Transform SpecialReelTransform;
+  [SerializeField] private GameObject MiddleReelObject;
   [SerializeField] private float specialReelSpeedMultiplier = 0.4f;
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
 
-  int tweenHeight = 0;  //calculate the height at which tweening is done
+  int tweenHeight = 0;
+  private float topSlotImageY = 3393.2f;
 
   [SerializeField]
   private GameObject Image_Prefab;    //icons prefab
 
   private List<Tweener> alltweens = new List<Tweener>();
+  private Image[][] reelImages = new Image[3][];
+  private float[][] reelImageInitialLocalY = new float[3][];
+  private Coroutine[] recycleCoroutines = new Coroutine[3];
 
   [SerializeField]
   private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
@@ -579,21 +584,21 @@ public class SlotBehaviour : MonoBehaviour
     float spinStartTime = Time.time;
     if (IsFreeSpin && _isFirstFreeSpin)
     {
-      InitializeTweening(Slot_Transform[1]);
+      InitializeTweening(Slot_Transform[1], 1);
       yield return new WaitForSeconds(1.25f);
-      InitializeTweening(Slot_Transform[0]);
-      InitializeTweening(Slot_Transform[2]);
+      InitializeTweening(Slot_Transform[0], 0);
+      InitializeTweening(Slot_Transform[2], 2);
     }
     else if (IsFreeSpin)
     {
       for (int i = 0; i < numberOfSlots; i++)
-        InitializeTweening(Slot_Transform[i]);
+        InitializeTweening(Slot_Transform[i], i);
     }
     else
     {
       for (int i = 0; i < numberOfSlots; i++)
       {
-        InitializeTweening(Slot_Transform[i]);
+        InitializeTweening(Slot_Transform[i], i);
         yield return new WaitForSeconds(0.1f);
       }
     }
@@ -875,23 +880,77 @@ public class SlotBehaviour : MonoBehaviour
 
 
   #region TweeningCode
-  private void InitializeTweening(Transform slotTransform)
+  private void InitializeTweening(Transform slotTransform, int colIndex)
   {
-    slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-    Tweener tweener = slotTransform.DOLocalMoveY(-tweenHeight, 0.2f).SetLoops(-1, LoopType.Restart).SetDelay(0);
+    // Exclude any Image on slotTransform itself (e.g. Mask component image)
+    List<Image> imageList = new List<Image>();
+    foreach (Image img in slotTransform.GetComponentsInChildren<Image>())
+      if (img.transform != slotTransform) imageList.Add(img);
+    Image[] images = imageList.ToArray();
+    System.Array.Sort(images, (a, b) => b.transform.localPosition.y.CompareTo(a.transform.localPosition.y));
+
+    reelImages[colIndex] = images;
+    reelImageInitialLocalY[colIndex] = new float[images.Length];
+    for (int i = 0; i < images.Length; i++)
+      reelImageInitialLocalY[colIndex][i] = images[i].transform.localPosition.y;
+
+    float imageSpacing = images.Length > 1
+      ? Mathf.Abs(images[0].transform.localPosition.y - images[1].transform.localPosition.y)
+      : (float)IconSizeFactor;
+
+    // Threshold entirely in local-space units: slotTransform.localY + image.localY < this value
+    // means the image has scrolled below the visible window bottom
+    float visibleBottomLocalY = float.MaxValue;
+    for (int r = 0; r < numberOfRows && r < TempImages[colIndex].slotImages.Count; r++)
+      visibleBottomLocalY = Mathf.Min(visibleBottomLocalY, TempImages[colIndex].slotImages[r].transform.localPosition.y);
+    float visibleBottomCanvasY = topSlotImageY + visibleBottomLocalY;
+
+    float recycleThreshold = visibleBottomCanvasY - imageSpacing;
+
+    if (recycleCoroutines[colIndex] != null) StopCoroutine(recycleCoroutines[colIndex]);
+    recycleCoroutines[colIndex] = StartCoroutine(RecycleReel(slotTransform, images, imageSpacing, recycleThreshold));
+
+    Tweener tweener = slotTransform.DOLocalMoveY(slotTransform.localPosition.y - tweenHeight, 0.2f)
+      .SetLoops(-1, LoopType.Incremental)
+      .SetEase(Ease.Linear)
+      .SetDelay(0);
     tweener.Play();
     alltweens.Add(tweener);
+  }
+
+  private IEnumerator RecycleReel(Transform slotTransform, Image[] images, float imageSpacing, float recycleThreshold)
+  {
+    while (true)
+    {
+      float parentLocalY = slotTransform.localPosition.y;
+      float maxLocalY = float.MinValue;
+      for (int i = 0; i < images.Length; i++)
+        maxLocalY = Mathf.Max(maxLocalY, images[i].transform.localPosition.y);
+
+      for (int i = 0; i < images.Length; i++)
+      {
+        if (parentLocalY + images[i].transform.localPosition.y < recycleThreshold)
+        {
+          Vector3 pos = images[i].transform.localPosition;
+          pos.y = maxLocalY + imageSpacing;
+          maxLocalY = pos.y;
+          images[i].transform.localPosition = pos;
+        }
+      }
+      yield return null;
+    }
   }
 
   private IEnumerator PlaySpecialWildReel()
   {
     if (!SpecialReelObject || !SpecialReelTransform) yield break;
     SpecialReelObject.SetActive(true);
-    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, 0);
-    Tweener specialTween = SpecialReelTransform.DOLocalMoveY(-tweenHeight, 0.2f / specialReelSpeedMultiplier).SetLoops(-1, LoopType.Restart);
+    if (MiddleReelObject) MiddleReelObject.SetActive(false);
+    Tweener specialTween = SpecialReelTransform.DOLocalMoveY(SpecialReelTransform.localPosition.y - tweenHeight, 0.2f / specialReelSpeedMultiplier).SetLoops(-1, LoopType.Restart);
     yield return new WaitForSeconds(specialReelDuration);
     specialTween.Kill();
     SpecialReelObject.SetActive(false);
+    if (MiddleReelObject) MiddleReelObject.SetActive(true);
   }
 
 
@@ -899,10 +958,25 @@ public class SlotBehaviour : MonoBehaviour
   private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
   {
     alltweens[index].Kill();
-    // int tweenpos = (reqpos * IconSizeFactor) - IconSizeFactor;
+
+    if (recycleCoroutines[index] != null)
+    {
+      StopCoroutine(recycleCoroutines[index]);
+      recycleCoroutines[index] = null;
+    }
+
+    if (reelImages[index] != null)
+    {
+      for (int i = 0; i < reelImages[index].Length; i++)
+      {
+        Vector3 pos = reelImages[index][i].transform.localPosition;
+        pos.y = reelImageInitialLocalY[index][i];
+        reelImages[index][i].transform.localPosition = pos;
+      }
+    }
+
     slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-    // TODO: hardcoded landing Y for now, was -tweenpos + 100 (the old IconSizeFactor-based formula). Needs tweaking and should eventually be made dynamic again instead of a fixed magic number.
-    alltweens[index] = slotTransform.DOLocalMoveY(3393.2f, duration).SetEase(Ease.OutElastic);
+    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, duration).SetEase(Ease.OutElastic);
     if (!isStop)
     {
       yield return new WaitForSeconds(0.2f);
@@ -936,9 +1010,13 @@ public class SlotBehaviour : MonoBehaviour
     for (int i = 0; i < numberOfSlots; i++)
     {
       alltweens[i].Kill();
+      if (recycleCoroutines[i] != null)
+      {
+        StopCoroutine(recycleCoroutines[i]);
+        recycleCoroutines[i] = null;
+      }
     }
     alltweens.Clear();
-
   }
   #endregion
 
