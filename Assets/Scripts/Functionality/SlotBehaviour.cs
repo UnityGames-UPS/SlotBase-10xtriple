@@ -41,7 +41,6 @@ public class SlotBehaviour : MonoBehaviour
   private Button Spin_Button;
   [SerializeField]
   private Button AutoSpin_Button;
-  [SerializeField] private Button AutoSpinStop_Button;
   [SerializeField]
   private Button MaxBet_Button;
   [SerializeField]
@@ -50,6 +49,9 @@ public class SlotBehaviour : MonoBehaviour
   private Button TBetMinus_Button;
   [SerializeField] private Sprite SpinSprite;
   [SerializeField] private Sprite StopSprite;
+  [SerializeField] private Sprite StopPressedSprite;
+  [SerializeField] private Sprite AutoSpinIdleSprite;
+  [SerializeField] private Sprite AutoSpinActiveSprite;
 
   [Header("Animated Sprites")]
   [SerializeField]
@@ -103,20 +105,24 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private GameObject SpecialReelObject;
   [SerializeField] private Transform SpecialReelTransform;
   [SerializeField] private GameObject MiddleReelObject;
-  [SerializeField] private float specialReelSpeedMultiplier = 0.4f;
+  [SerializeField] private float specialReelSpeedMultiplier = 0.8f;
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
 
   int tweenHeight = 0;
   private float topSlotImageY = 3393.2f;
 
-  [SerializeField]
-  private GameObject Image_Prefab;    //icons prefab
 
   private List<Tweener> alltweens = new List<Tweener>();
   private Image[][] reelImages = new Image[3][];
   private float[][] reelImageInitialLocalY = new float[3][];
   private Coroutine[] recycleCoroutines = new Coroutine[3];
+  private Coroutine _paylineCycleCoroutine;
+  private Tweener _specialReelSpinTween;
+  private Coroutine _specialReelRecycleCoroutine;
+  private Image[] _specialReelImages;
+  private float[] _specialReelImageInitialLocalY;
+  [SerializeField] private float paylineHoldDuration = 1.5f;
 
   [SerializeField]
   private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
@@ -128,6 +134,7 @@ public class SlotBehaviour : MonoBehaviour
   private Coroutine FreeSpinRoutine = null;
   private Coroutine tweenroutine;
   private Tween BalanceTween;
+  private Sprite _spinPressedSprite;
   internal bool IsAutoSpin = false;
   internal bool IsFreeSpin = false;
   private bool IsSpinning = false;
@@ -160,7 +167,7 @@ public class SlotBehaviour : MonoBehaviour
   {
     IsAutoSpin = false;
 
-    Debug.Log($"[SlotBehaviour.Start] Spin_Button is {(Spin_Button ? Spin_Button.name : "NULL")}");
+    if (Spin_Button) _spinPressedSprite = Spin_Button.spriteState.pressedSprite;
     if (Spin_Button) Spin_Button.onClick.RemoveAllListeners();
     if (Spin_Button) Spin_Button.onClick.AddListener(OnSpinButtonPressed);
 
@@ -176,67 +183,56 @@ public class SlotBehaviour : MonoBehaviour
     if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
     if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
 
-    if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.RemoveAllListeners();
-    if (AutoSpinStop_Button) AutoSpinStop_Button.onClick.AddListener(StopAutoSpin);
-
     tweenHeight = (15 * IconSizeFactor) - 280;
   }
 
   #region Autospin
   private void AutoSpin()
   {
-    if (IsAutoSpin || IsSpinning)
+    if (!IsAutoSpin)
     {
-      return;
+      if (IsSpinning) return;
+      if (currentBalance < currentTotalBet) { uiManager.LowBalPopup(); return; }
+      IsAutoSpin = true;
+      SetAutoSpinButtonSprite(true);
+      if (AutoSpinRoutine != null) { StopCoroutine(AutoSpinRoutine); AutoSpinRoutine = null; }
+      AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine());
     }
-    IsAutoSpin = true;
-    if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(true);
-    if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(false);
-
-    if (AutoSpinRoutine != null)
+    else
     {
-      StopCoroutine(AutoSpinRoutine);
-      AutoSpinRoutine = null;
+      StopAutoSpin();
     }
-    AutoSpinRoutine = StartCoroutine(AutoSpinCoroutine());
   }
 
   private void StopAutoSpin()
   {
-    audioController.PlayButton();
     if (IsAutoSpin)
     {
       IsAutoSpin = false;
-      if (AutoSpinStop_Button) AutoSpinStop_Button.gameObject.SetActive(false);
-      if (AutoSpin_Button) AutoSpin_Button.gameObject.SetActive(true);
-      StartCoroutine(StopAutoSpinCoroutine());
+      SetAutoSpinButtonSprite(false);
     }
+  }
+
+  private void SetAutoSpinButtonSprite(bool active)
+  {
+    if (AutoSpin_Button == null) return;
+    var img = AutoSpin_Button.GetComponent<Image>();
+    if (img == null) return;
+    img.sprite = active ? AutoSpinActiveSprite : AutoSpinIdleSprite;
   }
 
   private IEnumerator AutoSpinCoroutine()
   {
     while (IsAutoSpin)
     {
-      yield return new WaitUntil(() => !CheckPopups);
-      StartSlots(IsAutoSpin);
-      yield return tweenroutine;
+      yield return new WaitUntil(() => !CheckPopups && !IsSpinning);
+      if (currentBalance < currentTotalBet) { StopAutoSpin(); break; }
+      StartSlots(true);
+      yield return new WaitUntil(() => !IsSpinning);
       yield return new WaitForSeconds(SpinDelay);
     }
-    WasAutoSpinOn = false;
-  }
-
-  private IEnumerator StopAutoSpinCoroutine()
-  {
     yield return new WaitUntil(() => !IsSpinning);
     ToggleButtonGrp(true);
-    if (AutoSpinRoutine != null || tweenroutine != null)
-    {
-      StopCoroutine(AutoSpinRoutine);
-      StopCoroutine(tweenroutine);
-      tweenroutine = null;
-      AutoSpinRoutine = null;
-      StopCoroutine(StopAutoSpinCoroutine());
-    }
   }
   #endregion
 
@@ -274,6 +270,8 @@ public class SlotBehaviour : MonoBehaviour
       uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
       isFirstFreeSpin = false;
     } while (isFreeSpinActive);
+    if (SpecialReelObject) SpecialReelObject.SetActive(false);
+    if (MiddleReelObject) MiddleReelObject.SetActive(true);
     if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
     uiManager.EndFreeSpinTriggerSequence();
 
@@ -283,6 +281,7 @@ public class SlotBehaviour : MonoBehaviour
 
     if (WasAutoSpinOn)
     {
+      WasAutoSpinOn = false;
       AutoSpin();
     }
     else
@@ -349,7 +348,7 @@ public class SlotBehaviour : MonoBehaviour
     if (LineBet_text) LineBet_text.text = SocketManager.InitialData.bets[BetCounter].ToString();
     if (TotalBet_text) TotalBet_text.text = (SocketManager.InitialData.bets[BetCounter] * Lines).ToString();
     currentTotalBet = SocketManager.InitialData.bets[BetCounter] * Lines;
-
+    uiManager.SetBet(BetCounter);
   }
 
   private void ChangeBet(bool IncDec)
@@ -374,7 +373,7 @@ public class SlotBehaviour : MonoBehaviour
     if (LineBet_text) LineBet_text.text = SocketManager.InitialData.bets[BetCounter].ToString();
     if (TotalBet_text) TotalBet_text.text = (SocketManager.InitialData.bets[BetCounter] * Lines).ToString();
     currentTotalBet = SocketManager.InitialData.bets[BetCounter] * Lines;
-    uiManager.InitialiseUI(SocketManager.InitialData.bets, SocketManager.UIData.paylines.symbols);
+    uiManager.SetBet(BetCounter);
   }
 
   #region InitialFunctions
@@ -524,7 +523,6 @@ public class SlotBehaviour : MonoBehaviour
   #region SlotSpin
   private void OnSpinButtonPressed()
   {
-    Debug.Log($"[SpinButton] Clicked. IsSpinning={IsSpinning}");
     if (audioController) audioController.PlayButton();
     if (IsSpinning)
       OnStopSpinPressed();
@@ -557,6 +555,11 @@ public class SlotBehaviour : MonoBehaviour
     {
       StopGameAnimation();
     }
+    if (_paylineCycleCoroutine != null)
+    {
+      StopCoroutine(_paylineCycleCoroutine);
+      _paylineCycleCoroutine = null;
+    }
     for (int i = 0; i < PaylineGraphics.Count; i++)
     {
       PaylineGraphics[i].SetActive(false);
@@ -580,17 +583,24 @@ public class SlotBehaviour : MonoBehaviour
     IsSpinning = true;
 
     ToggleButtonGrp(false);
-    if (Spin_Button) Spin_Button.GetComponent<Image>().sprite = StopSprite;
+    if (Spin_Button)
+    {
+      Spin_Button.GetComponent<Image>().sprite = StopSprite;
+      var ss = Spin_Button.spriteState;
+      ss.pressedSprite = StopPressedSprite;
+      Spin_Button.spriteState = ss;
+    }
     float spinStartTime = Time.time;
     if (IsFreeSpin && _isFirstFreeSpin)
     {
-      InitializeTweening(Slot_Transform[1], 1);
-      yield return new WaitForSeconds(1.25f);
-      InitializeTweening(Slot_Transform[0], 0);
-      InitializeTweening(Slot_Transform[2], 2);
+      InitializeSpecialReelTweening();
+      yield return new WaitForSeconds(2f);
+      for (int i = 0; i < numberOfSlots; i++)
+        InitializeTweening(Slot_Transform[i], i);
     }
     else if (IsFreeSpin)
     {
+      InitializeSpecialReelTweening();
       for (int i = 0; i < numberOfSlots; i++)
         InitializeTweening(Slot_Transform[i], i);
     }
@@ -651,6 +661,8 @@ public class SlotBehaviour : MonoBehaviour
     bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin && !IsFreeSpin;
     for (int i = 0; i < numberOfSlots; i++)
     {
+      if (IsFreeSpin && i == 1)
+        StopSpecialReelTweening();
       bool isLastReel = i == numberOfSlots - 1;
       if (willTriggerFreeSpin && isLastReel)
       {
@@ -668,6 +680,9 @@ public class SlotBehaviour : MonoBehaviour
     if (Spin_Button)
     {
       Spin_Button.GetComponent<Image>().sprite = SpinSprite;
+      var ss = Spin_Button.spriteState;
+      ss.pressedSprite = _spinPressedSprite;
+      Spin_Button.spriteState = ss;
       Spin_Button.interactable = false;
     }
 
@@ -793,19 +808,33 @@ public class SlotBehaviour : MonoBehaviour
     CheckPopups = false;
   }
 
+  private IEnumerator CyclePaylines(List<int> lineIds)
+  {
+    while (true)
+    {
+      for (int i = 0; i < lineIds.Count; i++)
+      {
+        int id = lineIds[i];
+        if (PaylineGraphics.Count > id)
+        {
+          PaylineGraphics[id].SetActive(true);
+          StartGameAnimation(PaylineGraphics[id]);
+        }
+        yield return new WaitForSeconds(paylineHoldDuration);
+        if (PaylineGraphics.Count > id)
+          PaylineGraphics[id].SetActive(false);
+      }
+    }
+  }
+
   //generate the payout lines generated
   private void CheckPayoutLineBackend(List<int> LineId, double jackpot = 0)
   {
     if (LineId.Count > 0)
     {
-      for (int i = 0; i < LineId.Count; i++)
-      {
-        if (PaylineGraphics.Count > LineId[i])
-        {
-          PaylineGraphics[LineId[i]].SetActive(true);
-          StartGameAnimation(PaylineGraphics[LineId[i]]);
-        }
-      }
+      List<int> sortedIds = new List<int>(LineId);
+      sortedIds.Sort();
+      _paylineCycleCoroutine = StartCoroutine(CyclePaylines(sortedIds));
 
       if (jackpot > 0)
       {
@@ -915,7 +944,8 @@ public class SlotBehaviour : MonoBehaviour
       .SetEase(Ease.Linear)
       .SetDelay(0);
     tweener.Play();
-    alltweens.Add(tweener);
+    while (alltweens.Count <= colIndex) alltweens.Add(null);
+    alltweens[colIndex] = tweener;
   }
 
   private IEnumerator RecycleReel(Transform slotTransform, Image[] images, float imageSpacing, float recycleThreshold)
@@ -946,14 +976,67 @@ public class SlotBehaviour : MonoBehaviour
     if (!SpecialReelObject || !SpecialReelTransform) yield break;
     SpecialReelObject.SetActive(true);
     if (MiddleReelObject) MiddleReelObject.SetActive(false);
-    Tweener specialTween = SpecialReelTransform.DOLocalMoveY(SpecialReelTransform.localPosition.y - tweenHeight, 0.2f / specialReelSpeedMultiplier).SetLoops(-1, LoopType.Restart);
-    yield return new WaitForSeconds(specialReelDuration);
-    specialTween.Kill();
-    SpecialReelObject.SetActive(false);
-    if (MiddleReelObject) MiddleReelObject.SetActive(true);
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY);
+    yield return null;
   }
 
 
+
+  private void InitializeSpecialReelTweening()
+  {
+    if (!SpecialReelTransform) return;
+    SpecialReelTransform.DOKill();
+
+    List<Image> imageList = new List<Image>();
+    foreach (Image img in SpecialReelTransform.GetComponentsInChildren<Image>())
+      if (img.transform != SpecialReelTransform) imageList.Add(img);
+    _specialReelImages = imageList.ToArray();
+    System.Array.Sort(_specialReelImages, (a, b) => b.transform.localPosition.y.CompareTo(a.transform.localPosition.y));
+
+    _specialReelImageInitialLocalY = new float[_specialReelImages.Length];
+    for (int i = 0; i < _specialReelImages.Length; i++)
+      _specialReelImageInitialLocalY[i] = _specialReelImages[i].transform.localPosition.y;
+
+    float imageSpacing = _specialReelImages.Length > 1
+      ? Mathf.Abs(_specialReelImages[0].transform.localPosition.y - _specialReelImages[1].transform.localPosition.y)
+      : 150f;
+
+    float visibleBottomLocalY = float.MaxValue;
+    for (int r = 0; r < numberOfRows && r < TempImages[1].slotImages.Count; r++)
+      visibleBottomLocalY = Mathf.Min(visibleBottomLocalY, TempImages[1].slotImages[r].transform.localPosition.y);
+    float recycleThreshold = topSlotImageY + visibleBottomLocalY - imageSpacing;
+
+    if (_specialReelRecycleCoroutine != null) StopCoroutine(_specialReelRecycleCoroutine);
+    _specialReelRecycleCoroutine = StartCoroutine(RecycleReel(SpecialReelTransform, _specialReelImages, imageSpacing, recycleThreshold));
+
+    _specialReelSpinTween = SpecialReelTransform.DOLocalMoveY(SpecialReelTransform.localPosition.y - tweenHeight, 0.2f / specialReelSpeedMultiplier)
+      .SetLoops(-1, LoopType.Incremental)
+      .SetEase(Ease.Linear);
+    _specialReelSpinTween.Play();
+  }
+
+  private void StopSpecialReelTweening()
+  {
+    if (!SpecialReelTransform) return;
+    _specialReelSpinTween?.Kill();
+    _specialReelSpinTween = null;
+    if (_specialReelRecycleCoroutine != null)
+    {
+      StopCoroutine(_specialReelRecycleCoroutine);
+      _specialReelRecycleCoroutine = null;
+    }
+    if (_specialReelImages != null)
+    {
+      for (int i = 0; i < _specialReelImages.Length; i++)
+      {
+        Vector3 pos = _specialReelImages[i].transform.localPosition;
+        pos.y = _specialReelImageInitialLocalY[i];
+        _specialReelImages[i].transform.localPosition = pos;
+      }
+    }
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, 0);
+    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.5f).SetEase(Ease.OutElastic);
+  }
 
   private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
   {
@@ -1017,6 +1100,13 @@ public class SlotBehaviour : MonoBehaviour
       }
     }
     alltweens.Clear();
+    _specialReelSpinTween?.Kill();
+    _specialReelSpinTween = null;
+    if (_specialReelRecycleCoroutine != null)
+    {
+      StopCoroutine(_specialReelRecycleCoroutine);
+      _specialReelRecycleCoroutine = null;
+    }
   }
   #endregion
 
