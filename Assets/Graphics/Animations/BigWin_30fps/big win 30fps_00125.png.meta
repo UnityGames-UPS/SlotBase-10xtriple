@@ -1,0 +1,559 @@
+fileFormatVersion: 2
+guid: 42a27a1c7ebc23c46b6a0af6be78079a
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 22542357914198956
+    second: big win 30fps_00125_0
+  - first:
+      213: -7113844447545614032
+    second: big win 30fps_00125_1
+  - first:
+      213: -7472538767848515840
+    second: big win 30fps_00125_2
+  - first:
+      213: 7443467711213663210
+    second: big win 30fps_00125_3
+  - first:
+      213: -211589769013054398
+    second: big win 30fps_00125_4
+  - first:
+      213: -9100297258508909780
+    second: big win 30fps_00125_5
+  - first:
+      213: -3949548437726899287
+    second: big win 30fps_00125_6
+  - first:
+      213: -1206369715862242853
+    second: big win 30fps_00125_7
+  - first:
+      213: 837595619069562368
+    second: big win 30fps_00125_8
+  - first:
+      213: -5625441399642525360
+    second: big win 30fps_00125_9
+  - first:
+      213: 6012391055540079681
+    second: big win 30fps_00125_10
+  - first:
+      213: 8462227106876463431
+    second: big win 30fps_00125_11
+  - first:
+      213: -4048120221437545735
+    second: big win 30fps_00125_12
+  - first:
+      213: -2499178131564990882
+    second: big win 30fps_00125_13
+  - first:
+      213: 8819343721156317413
+    second: big win 30fps_00125_14
+  - first:
+      213: -7692921151001981743
+    second: big win 30fps_00125_15
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: big win 30fps_00125_0
+      rect:
+        serializedVersion: 2
+        x: 178
+        y: 1414
+        width: 12
+        height: 26
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ca320e3b726105000800000000000000
+      internalID: 22542357914198956
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_1
+      rect:
+        serializedVersion: 2
+        x: 337
+        y: 1283
+        width: 326
+        height: 157
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 031a8ac6a2c864d90800000000000000
+      internalID: -7113844447545614032
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_2
+      rect:
+        serializedVersion: 2
+        x: 559
+        y: 375
+        width: 1071
+        height: 1065
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 007dd04f4953c4890800000000000000
+      internalID: -7472538767848515840
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_3
+      rect:
+        serializedVersion: 2
+        x: 1586
+        y: 1114
+        width: 588
+        height: 326
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ae3faf732728c4760800000000000000
+      internalID: 7443467711213663210
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_4
+      rect:
+        serializedVersion: 2
+        x: 1595
+        y: 1416
+        width: 59
+        height: 24
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 244bed3e938401df0800000000000000
+      internalID: -211589769013054398
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_5
+      rect:
+        serializedVersion: 2
+        x: 2030
+        y: 1429
+        width: 19
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c238d1cdbdf35b180800000000000000
+      internalID: -9100297258508909780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_6
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 1283
+        width: 56
+        height: 105
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9a3d61a1f926039c0800000000000000
+      internalID: -3949548437726899287
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_7
+      rect:
+        serializedVersion: 2
+        x: 1551
+        y: 723
+        width: 126
+        height: 135
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bd9fd32922d124fe0800000000000000
+      internalID: -1206369715862242853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_8
+      rect:
+        serializedVersion: 2
+        x: 2041
+        y: 269
+        width: 299
+        height: 704
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 00e801c17ccbf9b00800000000000000
+      internalID: 837595619069562368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_9
+      rect:
+        serializedVersion: 2
+        x: 2295
+        y: 850
+        width: 45
+        height: 167
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 051f7851ada6ee1b0800000000000000
+      internalID: -5625441399642525360
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_10
+      rect:
+        serializedVersion: 2
+        x: 199
+        y: 238
+        width: 566
+        height: 415
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 14cc33c5fcd407350800000000000000
+      internalID: 6012391055540079681
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_11
+      rect:
+        serializedVersion: 2
+        x: 1600
+        y: 582
+        width: 94
+        height: 101
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7499d0a08bedf6570800000000000000
+      internalID: 8462227106876463431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_12
+      rect:
+        serializedVersion: 2
+        x: 1092
+        y: 0
+        width: 373
+        height: 260
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f2b3214b1032d7c0800000000000000
+      internalID: -4048120221437545735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_13
+      rect:
+        serializedVersion: 2
+        x: 1494
+        y: 166
+        width: 269
+        height: 116
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e5ee4a50bb2215dd0800000000000000
+      internalID: -2499178131564990882
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_14
+      rect:
+        serializedVersion: 2
+        x: 844
+        y: 0
+        width: 106
+        height: 80
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5e01893336a946a70800000000000000
+      internalID: 8819343721156317413
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: big win 30fps_00125_15
+      rect:
+        serializedVersion: 2
+        x: 1534
+        y: 0
+        width: 247
+        height: 96
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1dc0075d8f04d3590800000000000000
+      internalID: -7692921151001981743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      big win 30fps_00125_0: 22542357914198956
+      big win 30fps_00125_1: -7113844447545614032
+      big win 30fps_00125_10: 6012391055540079681
+      big win 30fps_00125_11: 8462227106876463431
+      big win 30fps_00125_12: -4048120221437545735
+      big win 30fps_00125_13: -2499178131564990882
+      big win 30fps_00125_14: 8819343721156317413
+      big win 30fps_00125_15: -7692921151001981743
+      big win 30fps_00125_2: -7472538767848515840
+      big win 30fps_00125_3: 7443467711213663210
+      big win 30fps_00125_4: -211589769013054398
+      big win 30fps_00125_5: -9100297258508909780
+      big win 30fps_00125_6: -3949548437726899287
+      big win 30fps_00125_7: -1206369715862242853
+      big win 30fps_00125_8: 837595619069562368
+      big win 30fps_00125_9: -5625441399642525360
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

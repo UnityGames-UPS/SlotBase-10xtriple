@@ -591,7 +591,7 @@ public class UIManager : MonoBehaviour
     if (BonusWinAmountText) BonusWinAmountText.text = "0.000";
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(true);
 
-    if (audioManager) audioManager.PlayBigWin();
+    if (audioManager) audioManager.PlayBigBonus();
     if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.doLoopAnimation = true; BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.StartAnimation(); }
 
     if (BonusWinPanel) BonusWinPanel.DOScale(Vector3.one, bonusWinScaleDuration).SetEase(Ease.OutBack);

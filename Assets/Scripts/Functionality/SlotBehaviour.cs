@@ -110,7 +110,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private GameObject SpecialReelObject;
   [SerializeField] private Transform SpecialReelTransform;
   [SerializeField] private GameObject MiddleReelObject;
-  [SerializeField] private float specialReelSpeedMultiplier = 0.8f;
+  [SerializeField] private float specialReelSpeedMultiplier = 0.6f;
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
 
@@ -143,7 +143,6 @@ public class SlotBehaviour : MonoBehaviour
   internal bool IsAutoSpin = false;
   internal bool IsFreeSpin = false;
   private bool IsSpinning = false;
-  private bool CheckSpinAudio = false;
   internal bool CheckPopups = false;
   internal int BetCounter = 0;
   private double currentBalance = 0;
@@ -411,8 +410,11 @@ public class SlotBehaviour : MonoBehaviour
         {
           PopulateAnimationSprites(animScript, val);
 
-          animScript.StartAnimation();
-          TempList.Add(animScript);
+          if (val != 10)
+          {
+            animScript.StartAnimation();
+            TempList.Add(animScript);
+          }
         }
       }
     }
@@ -585,7 +587,7 @@ public class SlotBehaviour : MonoBehaviour
       ToggleButtonGrp(true);
       yield break;
     }
-    CheckSpinAudio = true;
+    if (audioController) audioController.PlaySpinLoop();
 
     IsSpinning = true;
 
@@ -694,6 +696,7 @@ public class SlotBehaviour : MonoBehaviour
     }
 
     KillAllTweens();
+    if (audioController) audioController.StopSpinLoop();
 
     if (_animateAllSymbols)
     {
@@ -705,6 +708,21 @@ public class SlotBehaviour : MonoBehaviour
         }
       }
     }
+
+    bool anyScatter = false;
+    for (int row = 0; row < numberOfRows; row++)
+    {
+      for (int col = 0; col < numberOfSlots; col++)
+      {
+        if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10)
+        {
+          if (!_animateAllSymbols)
+            StartGameAnimation(TempImages[col].slotImages[row].gameObject);
+          anyScatter = true;
+        }
+      }
+    }
+    if (anyScatter && audioController) audioController.PlayAllScatter();
 
     if (!IsFreeSpin && SocketManager.ResultData.payload.winAmount > 0)
     {
@@ -749,7 +767,6 @@ public class SlotBehaviour : MonoBehaviour
 
     if (SocketManager.ResultData.features.jackpot.isTriggered)
     {
-      if (audioController) audioController.PlayJackpotWin();
       CheckPopups = false;
       yield return new WaitUntil(() => !CheckPopups);
       CheckPopups = true;
@@ -770,6 +787,7 @@ public class SlotBehaviour : MonoBehaviour
     }
     if (willTriggerFreeSpin)
     {
+      if (audioController) audioController.PlayScatterFreeSpin();
       if (ScatterTrigger_Sprite != null && ScatterTrigger_Sprite.Length > 0)
       {
         for (int row = 0; row < numberOfRows; row++)
@@ -899,7 +917,6 @@ public class SlotBehaviour : MonoBehaviour
         }
       }
     }
-    CheckSpinAudio = false;
   }
 
   #endregion
@@ -1017,6 +1034,7 @@ public class SlotBehaviour : MonoBehaviour
   private void InitializeSpecialReelTweening()
   {
     if (!SpecialReelTransform) return;
+    if (audioController) audioController.PlaySpecialReelSpin();
     SpecialReelTransform.DOKill();
 
     List<Image> imageList = new List<Image>();
@@ -1050,6 +1068,7 @@ public class SlotBehaviour : MonoBehaviour
   private void StopSpecialReelTweening()
   {
     if (!SpecialReelTransform) return;
+    if (audioController) audioController.StopSpecialReelSpin();
     _specialReelSpinTween?.Kill();
     _specialReelSpinTween = null;
     if (_specialReelRecycleCoroutine != null)
@@ -1067,7 +1086,7 @@ public class SlotBehaviour : MonoBehaviour
       }
     }
     SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, 0);
-    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.5f).SetEase(Ease.OutElastic);
+    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.5f).SetEase(Ease.OutCubic);
   }
 
   private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
@@ -1091,7 +1110,7 @@ public class SlotBehaviour : MonoBehaviour
     }
 
     slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, duration).SetEase(Ease.OutElastic);
+    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, duration).SetEase(Ease.OutCubic);
     if (!isStop)
     {
       yield return new WaitForSeconds(0.2f);

@@ -4145,6 +4145,14 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipBg
+      value: 
+      objectReference: {fileID: 8300000, guid: 68a59e2127266ee438d5642a667f34bf, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipButton
+      value: 
+      objectReference: {fileID: 8300000, guid: c6c7054d559f003458de26522ea9122f, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
       propertyPath: clipBonusBg
       value: 
       objectReference: {fileID: 8300000, guid: 1452fbcdc7a11bf408aa7e40ed9a1e28, type: 3}
@@ -4153,9 +4161,53 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 8300000, guid: 2be2fa1f0f966074098ee77684dde079, type: 3}
     - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipBigBonus
+      value: 
+      objectReference: {fileID: 8300000, guid: 1eef635ce6c5fbe40aeb8bc9f56e8b27, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipReelStop
+      value: 
+      objectReference: {fileID: 8300000, guid: 2f1167dd62f0bff4ebfbedcd001212e3, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipSpinLoop
+      value: 
+      objectReference: {fileID: 8300000, guid: e029c08d6c8d3494392755b1d1f5edb5, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipAllScatter
+      value: 
+      objectReference: {fileID: 8300000, guid: 71cb4ad6454cede4ea66516429cf60bb, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipNormalIcon
+      value: 
+      objectReference: {fileID: 8300000, guid: 05b2887d5e606bc48b53120fe54aea42, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
       propertyPath: clipAudioToggle
       value: 
       objectReference: {fileID: 8300000, guid: 2be2fa1f0f966074098ee77684dde079, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipGameStarted
+      value: 
+      objectReference: {fileID: 8300000, guid: b0c505675996c4749a454f21d7f00722, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipFreeGameBonus
+      value: 
+      objectReference: {fileID: 8300000, guid: 145112376c7a5b04a9213d4066e42dab, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: specialReelSource
+      value: 
+      objectReference: {fileID: 1076650040}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipFreeGameStarted
+      value: 
+      objectReference: {fileID: 8300000, guid: 4a444a0a04c26574e8b88b47a7195402, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipScatterFreeSpin
+      value: 
+      objectReference: {fileID: 8300000, guid: 1c11655934d23d34faf1cec05dda7703, type: 3}
+    - target: {fileID: 6293375610026765241, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+      propertyPath: clipSpecialReelSpin
+      value: 
+      objectReference: {fileID: 8300000, guid: b0bf720ae4929774f93c0bd528e02673, type: 3}
     - target: {fileID: 8507266886385244306, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
       propertyPath: m_Resource
       value: 
@@ -8222,7 +8274,7 @@ PrefabInstance:
       objectReference: {fileID: 1728521618}
     - target: {fileID: 7610637853776029503, guid: fbbc9264dc50de44589243147c5ea3dc, type: 3}
       propertyPath: testToken
-      value: e3e4d4342f68469a8d0cba26c265b57d
+      value: 8f8e2c4f0e904054b06f1982a1c8141f
       objectReference: {fileID: 0}
     - target: {fileID: 7610637853776029503, guid: fbbc9264dc50de44589243147c5ea3dc, type: 3}
       propertyPath: uiManager
@@ -10351,6 +10403,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1074275029}
   m_CullTransparentMesh: 1
+--- !u!82 &1076650040 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 8507266886385244306, guid: 0574a4cf18d5cd94b97009e12488e861, type: 3}
+  m_PrefabInstance: {fileID: 357240838}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1079263711
 GameObject:
   m_ObjectHideFlags: 0
@@ -19654,7 +19711,7 @@ MonoBehaviour:
   - {fileID: 21300000, guid: fc5a71351fb446e4c83253cf2c2811bb, type: 3}
   - {fileID: 21300000, guid: bff89198a10b66b45a385807f2ef99a3, type: 3}
   - {fileID: 21300000, guid: c534d4365d8d6ad42ab1156e87fc4800, type: 3}
-  _animateAllSymbols: 1
+  _animateAllSymbols: 0
   Balance_text: {fileID: 1775440675}
   TotalBet_text: {fileID: 496041713}
   LineBet_text: {fileID: 0}
@@ -19669,7 +19726,7 @@ MonoBehaviour:
   SpecialReelObject: {fileID: 157130116}
   SpecialReelTransform: {fileID: 157130117}
   MiddleReelObject: {fileID: 1480330874}
-  specialReelSpeedMultiplier: 0.4
+  specialReelSpeedMultiplier: 0.1
   specialReelDuration: 2
   MiddleReelGlow: {fileID: 1509285910}
   paylineHoldDuration: 1.5

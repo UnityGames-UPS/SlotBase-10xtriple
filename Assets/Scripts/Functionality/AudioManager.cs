@@ -7,14 +7,13 @@ public class AudioManager : MonoBehaviour
 
     [Header("Audio Sources")]
     [SerializeField] private AudioSource bgMusicSource;
-    [SerializeField] private AudioSource bonusBgSource;
+    [SerializeField] private AudioSource specialReelSource;
     [SerializeField] private AudioSource spinSource;
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource overlapSource;
 
     [Header("BG Music")]
     [SerializeField] private AudioClip clipBg;
-    [SerializeField] private AudioClip clipBonusBg;
 
     [Header("UI")]
     [SerializeField] private AudioClip clipButton;
@@ -27,24 +26,15 @@ public class AudioManager : MonoBehaviour
 
     [Header("Symbols")]
     [SerializeField] private AudioClip clipNormalIcon;
-    [SerializeField] private AudioClip clipJackpotIcon;
-    [SerializeField] private AudioClip clipBubblePop;
-    [SerializeField] private AudioClip clipCoinValueAppear;
 
     [Header("Features")]
-    [SerializeField] private AudioClip clipBatHit;
     [SerializeField] private AudioClip clipFreeGameStarted;
     [SerializeField] private AudioClip clipFreeGameBonus;
     [SerializeField] private AudioClip clipBigBonus;
-    [SerializeField] private AudioClip clipInsideJackpot;
-    [SerializeField] private AudioClip clipChoosedJackpot;
-    [SerializeField] private AudioClip clipTimerClock;
-
-    [Header("Jackpot")]
-    [SerializeField] private AudioClip clipJackpotWin;
-
-    [Header("Win")]
-    [SerializeField] private AudioClip clipBigWin;
+    [SerializeField] private AudioClip clipAllScatter;
+    [SerializeField] private AudioClip clipScatterFreeSpin;
+    [SerializeField] private AudioClip clipSpecialReelSpin;
+    [SerializeField] private AudioClip clipNumberFly;
 
     private bool _musicEnabled = true;
     private bool _sfxEnabled = true;
@@ -86,7 +76,6 @@ public class AudioManager : MonoBehaviour
     private void ApplyMusicVolume()
     {
         if (bgMusicSource) bgMusicSource.volume = _musicEnabled ? 1f : 0f;
-        if (bonusBgSource) bonusBgSource.volume = _musicEnabled ? 1f : 0f;
     }
 
     private void ApplySfxVolume()
@@ -95,6 +84,7 @@ public class AudioManager : MonoBehaviour
         if (sfxSource) sfxSource.volume = v;
         if (overlapSource) overlapSource.volume = v;
         if (spinSource) spinSource.volume = v;
+        if (specialReelSource) specialReelSource.volume = v;
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
@@ -132,22 +122,6 @@ public class AudioManager : MonoBehaviour
         bgMusicSource.Play();
     }
 
-    internal void PlayBonusBgMusic()
-    {
-        if (bonusBgSource == null || clipBonusBg == null) return;
-        StopSource(bgMusicSource);
-        bonusBgSource.clip = clipBonusBg;
-        bonusBgSource.loop = true;
-        bonusBgSource.volume = _musicEnabled ? 1f : 0f;
-        bonusBgSource.Play();
-    }
-
-    internal void StopBonusBgMusic()
-    {
-        StopSource(bonusBgSource);
-        PlayBgMusic();
-    }
-
     // ── UI ────────────────────────────────────────────────────────────────────
 
     internal void PlayButton() => PlayOneShot(sfxSource, clipButton);
@@ -172,37 +146,26 @@ public class AudioManager : MonoBehaviour
     // ── Symbols ───────────────────────────────────────────────────────────────
 
     internal void PlayNormalIcon() => PlayOneShot(sfxSource, clipNormalIcon);
-    internal void PlayJackpotIcon() => PlayOneShot(sfxSource, clipJackpotIcon);
-    internal void PlayBubblePop() => PlayOneShot(overlapSource, clipBubblePop);
-    internal void PlayCoinValueAppear() => PlayOneShot(overlapSource, clipCoinValueAppear);
 
     // ── Features ──────────────────────────────────────────────────────────────
 
-    internal void PlayBatHit() => PlayOneShot(sfxSource, clipBatHit);
     internal void PlayFreeGameStarted() => PlayOneShot(sfxSource, clipFreeGameStarted);
     internal void PlayFreeGameBonus() => PlayOneShot(sfxSource, clipFreeGameBonus);
     internal void PlayBigBonus() => PlayOneShot(sfxSource, clipBigBonus);
-    internal void PlayInsideJackpot() => PlayOneShot(sfxSource, clipInsideJackpot);
-    internal void PlayChoosedJackpot() => PlayOneShot(sfxSource, clipChoosedJackpot);
+    internal void PlayAllScatter() => PlayOneShot(sfxSource, clipAllScatter);
+    internal void PlayScatterFreeSpin() => PlayOneShot(sfxSource, clipScatterFreeSpin);
+    internal void PlayNumberFly() => PlayOneShot(sfxSource, clipNumberFly);
 
-    internal void PlayTimerClock()
+    internal void PlaySpecialReelSpin()
     {
-        if (sfxSource == null || clipTimerClock == null) return;
-        sfxSource.clip = clipTimerClock;
-        sfxSource.loop = true;
-        sfxSource.volume = _sfxEnabled ? 1f : 0f;
-        sfxSource.Play();
+        if (specialReelSource == null || clipSpecialReelSpin == null) return;
+        specialReelSource.clip = clipSpecialReelSpin;
+        specialReelSource.loop = true;
+        specialReelSource.volume = _sfxEnabled ? 1f : 0f;
+        specialReelSource.Play();
     }
 
-    internal void StopTimerClock() => StopSource(sfxSource);
-
-    // ── Jackpots ──────────────────────────────────────────────────────────────
-
-    internal void PlayJackpotWin() => PlayOneShot(sfxSource, clipJackpotWin);
-
-    // ── Win ───────────────────────────────────────────────────────────────────
-
-    internal void PlayBigWin() => PlayOneShot(sfxSource, clipBigWin);
+    internal void StopSpecialReelSpin() => StopSource(specialReelSource);
 
     // ── Focus Handling ────────────────────────────────────────────────────────
 
@@ -218,13 +181,6 @@ public class AudioManager : MonoBehaviour
 
     private void HandleFocus(bool hasFocus)
     {
-        if (!hasFocus)
-        {
-            AudioListener.volume = 0f;
-        }
-        else
-        {
-            AudioListener.volume = 1f;
-        }
+        AudioListener.volume = hasFocus ? 1f : 0f;
     }
 }
