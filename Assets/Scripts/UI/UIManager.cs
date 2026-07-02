@@ -462,7 +462,18 @@ public class UIManager : MonoBehaviour
 
   internal void UpdateFreeSpinsRemaining(int remaining)
   {
-    if (FreeSpinsLogoCountText) FreeSpinsLogoCountText.text = remaining.ToString();
+    if (!FreeSpinsLogoCountText) return;
+    FreeSpinsLogoCountText.transform.DOKill();
+    FreeSpinsLogoCountText.transform
+      .DOScaleY(0f, 0.1f)
+      .SetEase(Ease.InBack)
+      .OnComplete(() =>
+      {
+        FreeSpinsLogoCountText.text = remaining.ToString();
+        FreeSpinsLogoCountText.transform
+          .DOScaleY(1f, 0.15f)
+          .SetEase(Ease.OutBack);
+      });
   }
 
   internal IEnumerator ShowSpinWin(double winAmount)
@@ -523,12 +534,11 @@ public class UIManager : MonoBehaviour
   internal void InitialiseUI(List<double> bets, List<Symbol> symbols)
   {
     betAmounts = bets;
-    UpdateBetDisplay(betAmounts[0]);
   }
 
-  internal void SetBet(int betIndex)
+  internal void SetBet(double totalBet)
   {
-    UpdateBetDisplay(betAmounts[betIndex]);
+    UpdateBetDisplay(totalBet);
   }
 
   internal void ShowTicker()

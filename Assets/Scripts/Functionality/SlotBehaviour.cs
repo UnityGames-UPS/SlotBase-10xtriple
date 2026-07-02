@@ -76,6 +76,11 @@ public class SlotBehaviour : MonoBehaviour
   private Sprite[] Wild10x_Sprite;
   [SerializeField]
   private Sprite[] Scatter_Sprite;
+  [SerializeField]
+  private Sprite[] ScatterTrigger_Sprite;
+
+  [Header("Debug")]
+  [SerializeField] private bool _animateAllSymbols = true;
 
   [Header("Miscellaneous UI")]
   [SerializeField]
@@ -185,6 +190,7 @@ public class SlotBehaviour : MonoBehaviour
 
     tweenHeight = (15 * IconSizeFactor) - 280;
   }
+
 
   #region Autospin
   private void AutoSpin()
@@ -348,7 +354,7 @@ public class SlotBehaviour : MonoBehaviour
     if (LineBet_text) LineBet_text.text = SocketManager.InitialData.bets[BetCounter].ToString();
     if (TotalBet_text) TotalBet_text.text = (SocketManager.InitialData.bets[BetCounter] * Lines).ToString();
     currentTotalBet = SocketManager.InitialData.bets[BetCounter] * Lines;
-    uiManager.SetBet(BetCounter);
+    uiManager.SetBet(currentTotalBet);
   }
 
   private void ChangeBet(bool IncDec)
@@ -373,7 +379,7 @@ public class SlotBehaviour : MonoBehaviour
     if (LineBet_text) LineBet_text.text = SocketManager.InitialData.bets[BetCounter].ToString();
     if (TotalBet_text) TotalBet_text.text = (SocketManager.InitialData.bets[BetCounter] * Lines).ToString();
     currentTotalBet = SocketManager.InitialData.bets[BetCounter] * Lines;
-    uiManager.SetBet(BetCounter);
+    uiManager.SetBet(currentTotalBet);
   }
 
   #region InitialFunctions
@@ -426,6 +432,7 @@ public class SlotBehaviour : MonoBehaviour
     currentTotalBet = SocketManager.InitialData.bets[BetCounter] * Lines;
     CompareBalance();
     uiManager.InitialiseUI(SocketManager.InitialData.bets, SocketManager.UIData.paylines.symbols);
+    uiManager.SetBet(currentTotalBet);
   }
   #endregion
 
@@ -688,11 +695,14 @@ public class SlotBehaviour : MonoBehaviour
 
     KillAllTweens();
 
-    for (int i = 0; i < numberOfRows; i++)
+    if (_animateAllSymbols)
     {
-      for (int j = 0; j < numberOfSlots; j++)
+      for (int i = 0; i < numberOfRows; i++)
       {
-        StartGameAnimation(TempImages[j].slotImages[i].gameObject);
+        for (int j = 0; j < numberOfSlots; j++)
+        {
+          StartGameAnimation(TempImages[j].slotImages[i].gameObject);
+        }
       }
     }
 
@@ -760,6 +770,28 @@ public class SlotBehaviour : MonoBehaviour
     }
     if (willTriggerFreeSpin)
     {
+      if (ScatterTrigger_Sprite != null && ScatterTrigger_Sprite.Length > 0)
+      {
+        for (int row = 0; row < numberOfRows; row++)
+        {
+          for (int col = 0; col < numberOfSlots; col++)
+          {
+            if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10)
+            {
+              ImageAnimation anim = TempImages[col].slotImages[row].GetComponent<ImageAnimation>();
+              if (anim != null)
+              {
+                anim.textureArray.Clear();
+                foreach (Sprite s in ScatterTrigger_Sprite)
+                  anim.textureArray.Add(s);
+                anim.doLoopAnimation = true;
+                anim.StartAnimation();
+              }
+            }
+          }
+        }
+      }
+
       yield return StartCoroutine(uiManager.PlayFreeSpinTriggerSequence(SocketManager.ResultData.features.freeSpin.count));
       if (MiddleReelGlow) MiddleReelGlow.SetActive(true);
       yield return StartCoroutine(PlaySpecialWildReel());
