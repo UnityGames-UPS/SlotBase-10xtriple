@@ -148,6 +148,7 @@ public class ImageAnimation : MonoBehaviour
 
 	private void SetTextureOfIndex()
 	{
+		if (rendererDelegate == null) return;
 		rendererDelegate.sprite = textureArray[indexOfTexture];
 	}
 }

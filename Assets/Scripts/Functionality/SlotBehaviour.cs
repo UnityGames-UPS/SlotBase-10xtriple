@@ -110,6 +110,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
   [SerializeField] private GameObject LastReelGlow;
+  [SerializeField] private GameObject FreeSpinSlotMachine;
 
   int tweenHeight = 0;
   private float topSlotImageY = 3393.2f;
@@ -245,6 +246,7 @@ public class SlotBehaviour : MonoBehaviour
     {
       uiManager.UpdateFreeSpinsRemaining(spins);
       IsFreeSpin = true;
+      if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(true);
       ToggleButtonGrp(false);
 
       if (FreeSpinRoutine != null)
@@ -275,6 +277,7 @@ public class SlotBehaviour : MonoBehaviour
     if (SpecialReelObject) SpecialReelObject.SetActive(false);
     if (MiddleReelObject) MiddleReelObject.SetActive(true);
     if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
+    if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(false);
     uiManager.EndFreeSpinTriggerSequence();
 
     double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
@@ -596,7 +599,6 @@ public class SlotBehaviour : MonoBehaviour
       ss.pressedSprite = StopPressedSprite;
       Spin_Button.spriteState = ss;
     }
-    float spinStartTime = Time.time;
     if (IsFreeSpin && _isFirstFreeSpin)
     {
       InitializeSpecialReelTweening();
@@ -618,6 +620,7 @@ public class SlotBehaviour : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
       }
     }
+    float spinStartTime = Time.time;
 
     if (!IsFreeSpin)
     {
@@ -775,13 +778,13 @@ public class SlotBehaviour : MonoBehaviour
     if (IsFreeSpin)
     {
       yield return StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
-      yield return StartCoroutine(uiManager.ShowBonusWinSequence(SocketManager.ResultData.payload.winAmount, currentTotalBet));
     }
     else
     {
-      StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
       if (CheckAnyPureWildLine())
         yield return StartCoroutine(uiManager.ShowBigWinSequence(SocketManager.ResultData.payload.winAmount));
+      else
+        StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
     }
 
     if (SocketManager.ResultData.features.jackpot.isTriggered)
@@ -875,20 +878,14 @@ public class SlotBehaviour : MonoBehaviour
   private bool CheckAnyPureWildLine()
   {
     if (SocketManager.ResultData.payload.wins == null) return false;
-    int[][] paylines = {
-      new int[] { 2, 2, 2 },
-      new int[] { 1, 1, 1 },
-      new int[] { 3, 3, 3 },
-      new int[] { 1, 2, 3 },
-      new int[] { 3, 2, 1 }
-    };
+    var lines = SocketManager.InitialData.lines;
     foreach (var win in SocketManager.ResultData.payload.wins)
     {
-      int lineIndex = win.line - 1;
-      if (lineIndex < 0 || lineIndex >= paylines.Length) continue;
-      int[] rows = paylines[lineIndex];
+      int lineIndex = win.line;
+      if (lineIndex < 0 || lineIndex >= lines.Count) continue;
+      var rows = lines[lineIndex];
       bool pureWild = true;
-      for (int col = 0; col < rows.Length; col++)
+      for (int col = 0; col < rows.Count; col++)
       {
         int symbolId = int.Parse(SocketManager.ResultData.matrix[rows[col]][col]);
         if (symbolId < 6 || symbolId > 9) { pureWild = false; break; }
@@ -985,6 +982,7 @@ public class SlotBehaviour : MonoBehaviour
   //start the icons animation
   private void StartGameAnimation(GameObject animObjects)
   {
+    if (!animObjects.activeInHierarchy) return;
     ImageAnimation temp = animObjects.GetComponent<ImageAnimation>();
     if (temp == null) return;
     temp.StartAnimation();
