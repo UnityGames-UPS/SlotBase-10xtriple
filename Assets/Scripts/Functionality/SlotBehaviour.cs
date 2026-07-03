@@ -109,6 +109,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private float specialReelSpeedMultiplier = 0.6f;
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
+  [SerializeField] private GameObject LastReelGlow;
 
   int tweenHeight = 0;
   private float topSlotImageY = 3393.2f;
@@ -671,9 +672,11 @@ public class SlotBehaviour : MonoBehaviour
       bool isLastReel = i == numberOfSlots - 1;
       if (willTriggerFreeSpin && isLastReel)
       {
+        if (LastReelGlow) LastReelGlow.SetActive(true);
         uiManager.StartAnticipationZoom(anticipationExtraSpinDuration);
         yield return new WaitForSeconds(anticipationExtraSpinDuration);
         yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
+        if (LastReelGlow) LastReelGlow.SetActive(false);
       }
       else
       {
@@ -777,6 +780,8 @@ public class SlotBehaviour : MonoBehaviour
     else
     {
       StartCoroutine(uiManager.ShowSpinWin(SocketManager.ResultData.payload.winAmount));
+      if (CheckAnyPureWildLine())
+        yield return StartCoroutine(uiManager.ShowBigWinSequence(SocketManager.ResultData.payload.winAmount));
     }
 
     if (SocketManager.ResultData.features.jackpot.isTriggered)
@@ -865,6 +870,32 @@ public class SlotBehaviour : MonoBehaviour
     {
       if (Balance_text) Balance_text.text = initAmount.ToString("F3");
     });
+  }
+
+  private bool CheckAnyPureWildLine()
+  {
+    if (SocketManager.ResultData.payload.wins == null) return false;
+    int[][] paylines = {
+      new int[] { 2, 2, 2 },
+      new int[] { 1, 1, 1 },
+      new int[] { 3, 3, 3 },
+      new int[] { 1, 2, 3 },
+      new int[] { 3, 2, 1 }
+    };
+    foreach (var win in SocketManager.ResultData.payload.wins)
+    {
+      int lineIndex = win.line - 1;
+      if (lineIndex < 0 || lineIndex >= paylines.Length) continue;
+      int[] rows = paylines[lineIndex];
+      bool pureWild = true;
+      for (int col = 0; col < rows.Length; col++)
+      {
+        int symbolId = int.Parse(SocketManager.ResultData.matrix[rows[col]][col]);
+        if (symbolId < 6 || symbolId > 9) { pureWild = false; break; }
+      }
+      if (pureWild) return true;
+    }
+    return false;
   }
 
   internal void CheckWinPopups()

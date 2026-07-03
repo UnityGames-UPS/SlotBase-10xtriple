@@ -47,13 +47,22 @@ public class UIManager : MonoBehaviour
   [SerializeField] private GameObject MainLogo;
   [SerializeField] private GameObject FreeSpinsLogoDisplay;
   [SerializeField] private TMP_Text FreeSpinsLogoCountText;
-  [SerializeField] private TMP_Text FreeSpinsAwardedText;
+  [SerializeField] private ImageAnimation FreeSpinsCountAnimation;
   [SerializeField] private RectTransform FreeGraphic;
   [SerializeField] private RectTransform SpinsGraphic;
   [SerializeField] private float freeSpinsSplitDuration = 0.4f;
   [SerializeField] private float freeSpinsCountDuration = 1.0f;
   [SerializeField] private float freeSpinsFlyDuration = 0.6f;
   [SerializeField] private float freeSpinsSplitDistance = 300f;
+
+  [Header("Big Win Sequence")]
+  [SerializeField] private GameObject BigWinSequencePanel;
+  [SerializeField] private RectTransform BigWinPanel;
+  [SerializeField] private RectTransform BigWinAmountPanel;
+  [SerializeField] private TMP_Text BigWinAmountText;
+  [SerializeField] private float bigWinShowDelay = 0f;
+  [SerializeField] private float bigWinCountDuration = 1.5f;
+  [SerializeField] private float bigWinHoldDuration = 2f;
 
   [Header("Bonus Win Sequence")]
   [SerializeField] private GameObject BonusWinSequencePanel;
@@ -470,7 +479,7 @@ public class UIManager : MonoBehaviour
     // Store starting positions
     Vector2 freeStart = FreeGraphic ? FreeGraphic.anchoredPosition : Vector2.zero;
     Vector2 spinsStart = SpinsGraphic ? SpinsGraphic.anchoredPosition : Vector2.zero;
-    Vector3 countTextStart = FreeSpinsAwardedText ? FreeSpinsAwardedText.transform.position : Vector3.zero;
+    Vector3 countAnimStart = FreeSpinsCountAnimation ? FreeSpinsCountAnimation.transform.position : Vector3.zero;
 
     // Show FREE and SPINS graphics then split apart
     if (FreeGraphic) FreeGraphic.gameObject.SetActive(true);
@@ -482,25 +491,20 @@ public class UIManager : MonoBehaviour
     if (freeSplit != null) yield return freeSplit.WaitForCompletion();
     else yield return new WaitForSeconds(freeSpinsSplitDuration);
 
-    // Count up number in the middle
-    if (FreeSpinsAwardedText)
+    // Play count animation in the middle
+    if (FreeSpinsCountAnimation)
     {
-      FreeSpinsAwardedText.gameObject.SetActive(true);
-      FreeSpinsAwardedText.alpha = 1f;
-      FreeSpinsAwardedText.transform.localScale = Vector3.one;
-      float countVal = 0f;
-      yield return DOTween.To(() => countVal, v => {
-        countVal = v;
-        FreeSpinsAwardedText.text = Mathf.CeilToInt(v).ToString();
-      }, spinCount, freeSpinsCountDuration).SetEase(Ease.OutQuad).WaitForCompletion();
-      FreeSpinsAwardedText.text = spinCount.ToString();
+      FreeSpinsCountAnimation.gameObject.SetActive(true);
+      FreeSpinsCountAnimation.StartAnimation();
+      yield return new WaitForSeconds(freeSpinsCountDuration);
     }
 
     // Fly number up to logo and fade it out; simultaneously bring FREE and SPINS back together
-    if (FreeSpinsAwardedText && FreeSpinsLogoDisplay)
+    Image countImage = FreeSpinsCountAnimation ? FreeSpinsCountAnimation.GetComponent<Image>() : null;
+    if (FreeSpinsCountAnimation && FreeSpinsLogoDisplay)
     {
-      FreeSpinsAwardedText.transform.DOMove(FreeSpinsLogoDisplay.transform.position, freeSpinsFlyDuration).SetEase(Ease.InCubic);
-      DOTween.To(() => FreeSpinsAwardedText.alpha, v => FreeSpinsAwardedText.alpha = v, 0f, freeSpinsFlyDuration);
+      FreeSpinsCountAnimation.transform.DOMove(FreeSpinsLogoDisplay.transform.position, freeSpinsFlyDuration).SetEase(Ease.InCubic);
+      if (countImage) countImage.DOFade(0f, freeSpinsFlyDuration);
     }
     if (FreeGraphic) FreeGraphic.DOAnchorPosX(freeStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
     if (SpinsGraphic) SpinsGraphic.DOAnchorPosX(spinsStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
@@ -509,11 +513,12 @@ public class UIManager : MonoBehaviour
     yield return new WaitForSeconds(0.5f);
 
     // Clean up
-    if (FreeSpinsAwardedText)
+    if (FreeSpinsCountAnimation)
     {
-      FreeSpinsAwardedText.gameObject.SetActive(false);
-      FreeSpinsAwardedText.transform.position = countTextStart;
-      FreeSpinsAwardedText.alpha = 1f;
+      FreeSpinsCountAnimation.StopAnimation();
+      FreeSpinsCountAnimation.gameObject.SetActive(false);
+      FreeSpinsCountAnimation.transform.position = countAnimStart;
+      if (countImage) { Color c = countImage.color; c.a = 1f; countImage.color = c; }
     }
     if (FreeGraphic) FreeGraphic.gameObject.SetActive(false);
     if (SpinsGraphic) SpinsGraphic.gameObject.SetActive(false);
@@ -661,7 +666,7 @@ public class UIManager : MonoBehaviour
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(true);
     if (BonusWinPanel) { ImageAnimation panelAnim = BonusWinPanel.GetComponent<ImageAnimation>(); if (panelAnim) panelAnim.StartAnimation(); }
 
-    if (audioManager) audioManager.PlayBigBonus();
+    if (audioManager) audioManager.PlaySuperBonusWinner();
 
     float bonusWinDisplay = 0f;
     if (BonusWinAmountText)
@@ -687,9 +692,35 @@ public class UIManager : MonoBehaviour
       SlideContainer.sprite = InfoSlides[index];
   }
 
+  internal IEnumerator ShowBigWinSequence(double totalWin)
+  {
+    yield return new WaitForSeconds(bigWinShowDelay);
+
+    if (BigWinAmountText) BigWinAmountText.text = "0.000";
+    if (BigWinSequencePanel) BigWinSequencePanel.SetActive(true);
+    if (BigWinPanel) { ImageAnimation panelAnim = BigWinPanel.GetComponent<ImageAnimation>(); if (panelAnim) panelAnim.StartAnimation(); }
+    if (audioManager) audioManager.PlaySuperBonusWinner();
+    if (BigWinAmountPanel)
+    {
+      Vector3 finalScale = BigWinAmountPanel.localScale;
+      BigWinAmountPanel.localScale = Vector3.zero;
+      BigWinAmountPanel.DOScale(finalScale, 0.6f).SetEase(Ease.OutBack).SetDelay(0.2f);
+    }
+
+    float bigWinDisplay = 0f;
+    if (BigWinAmountText)
+      yield return DOTween.To(() => bigWinDisplay, v => { bigWinDisplay = v; BigWinAmountText.text = v.ToString("F3"); },
+        (float)totalWin, bigWinCountDuration).WaitForCompletion();
+    else
+      yield return new WaitForSeconds(bigWinCountDuration);
+
+    yield return new WaitForSeconds(bigWinHoldDuration);
+
+    if (BigWinSequencePanel) BigWinSequencePanel.SetActive(false);
+  }
+
+
   // TODO: Add scale animation for BonusWinAmountText — frames/timing TBD with team
-  // TODO: Work on BigWin sequence (similar to BonusWin flow)
-  // TODO: Clarify trigger logic — when to show BonusWin vs BigWin
   // private IEnumerator DebugBonusWinPreview()
   // {
   //   yield return new WaitForSeconds(1.0f);

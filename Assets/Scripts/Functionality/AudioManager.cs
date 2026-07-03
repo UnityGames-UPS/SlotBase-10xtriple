@@ -31,6 +31,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip clipFreeGameStarted;
     [SerializeField] private AudioClip clipFreeGameBonus;
     [SerializeField] private AudioClip clipBigBonus;
+    [SerializeField] private AudioClip clipSuperBonusWinner;
     [SerializeField] private AudioClip clipAllScatter;
     [SerializeField] private AudioClip clipScatterFreeSpin;
     [SerializeField] private AudioClip clipSpecialReelSpin;
@@ -152,6 +153,7 @@ public class AudioManager : MonoBehaviour
     internal void PlayFreeGameStarted() => PlayOneShot(sfxSource, clipFreeGameStarted);
     internal void PlayFreeGameBonus() => PlayOneShot(sfxSource, clipFreeGameBonus);
     internal void PlayBigBonus() => PlayOneShot(sfxSource, clipBigBonus);
+    internal void PlaySuperBonusWinner() => PlayOneShot(sfxSource, clipSuperBonusWinner);
     internal void PlayAllScatter() => PlayOneShot(sfxSource, clipAllScatter);
     internal void PlayScatterFreeSpin() => PlayOneShot(sfxSource, clipScatterFreeSpin);
     internal void PlayNumberFly() => PlayOneShot(sfxSource, clipNumberFly);
