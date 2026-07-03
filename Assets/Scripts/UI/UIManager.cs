@@ -37,6 +37,9 @@ public class UIManager : MonoBehaviour
 
   [Header("Intro")]
   [SerializeField] private RectTransform GameContent;
+  private int _anticipationPunchStep = 0;
+  private readonly float[] _anticipationPunchScales = { 1.05f, 1.10f };
+  private const float _anticipationZoomTarget = 1.20f;
 
   [Header("Free Spin Trigger Sequence")]
   [SerializeField] private GameObject DarkenOverlay;
@@ -45,8 +48,12 @@ public class UIManager : MonoBehaviour
   [SerializeField] private GameObject FreeSpinsLogoDisplay;
   [SerializeField] private TMP_Text FreeSpinsLogoCountText;
   [SerializeField] private TMP_Text FreeSpinsAwardedText;
-  [SerializeField] private float freeSpinsPopupScaleDuration = 0.4f;
-  [SerializeField] private float freeSpinsPopupHoldDuration = 1.5f;
+  [SerializeField] private RectTransform FreeGraphic;
+  [SerializeField] private RectTransform SpinsGraphic;
+  [SerializeField] private float freeSpinsSplitDuration = 0.4f;
+  [SerializeField] private float freeSpinsCountDuration = 1.0f;
+  [SerializeField] private float freeSpinsFlyDuration = 0.6f;
+  [SerializeField] private float freeSpinsSplitDistance = 300f;
 
   [Header("Bonus Win Sequence")]
   [SerializeField] private GameObject BonusWinSequencePanel;
@@ -185,6 +192,7 @@ public class UIManager : MonoBehaviour
   private void Start()
   {
     StartCoroutine(PlayIntro());
+    // StartCoroutine(DebugBonusWinPreview());
 
     if (Menu_Button) Menu_Button.onClick.RemoveAllListeners();
     if (Menu_Button) Menu_Button.onClick.AddListener(OpenMenu);
@@ -431,27 +439,89 @@ public class UIManager : MonoBehaviour
     if (TotalWin_text) TotalWin_text.text = "0.000";
   }
 
+  internal void ScatterAnticipationPunch()
+  {
+    if (!GameContent || _anticipationPunchStep >= _anticipationPunchScales.Length) return;
+    float target = _anticipationPunchScales[_anticipationPunchStep++];
+    GameContent.DOKill();
+    GameContent.DOScale(Vector3.one * target, 0.15f).SetEase(Ease.OutBack);
+  }
+
+  internal void StartAnticipationZoom(float duration)
+  {
+    if (!GameContent) return;
+    GameContent.DOKill();
+    GameContent.DOScale(Vector3.one * _anticipationZoomTarget, duration).SetEase(Ease.Linear);
+  }
+
+  private void ResetAnticipationZoom()
+  {
+    _anticipationPunchStep = 0;
+    if (!GameContent) return;
+    GameContent.DOKill();
+    GameContent.DOScale(Vector3.one, 0.3f).SetEase(Ease.OutQuad);
+  }
+
   internal IEnumerator PlayFreeSpinTriggerSequence(int spinCount)
   {
+    ResetAnticipationZoom();
     if (DarkenOverlay) DarkenOverlay.SetActive(true);
-    if (FreeSpinsTriggerText) FreeSpinsTriggerText.SetActive(true);
 
+    // Store starting positions
+    Vector2 freeStart = FreeGraphic ? FreeGraphic.anchoredPosition : Vector2.zero;
+    Vector2 spinsStart = SpinsGraphic ? SpinsGraphic.anchoredPosition : Vector2.zero;
+    Vector3 countTextStart = FreeSpinsAwardedText ? FreeSpinsAwardedText.transform.position : Vector3.zero;
+
+    // Show FREE and SPINS graphics then split apart
+    if (FreeGraphic) FreeGraphic.gameObject.SetActive(true);
+    if (SpinsGraphic) SpinsGraphic.gameObject.SetActive(true);
+
+    Tween freeSplit = null;
+    if (FreeGraphic) freeSplit = FreeGraphic.DOAnchorPosX(freeStart.x - freeSpinsSplitDistance, freeSpinsSplitDuration).SetEase(Ease.OutBack);
+    if (SpinsGraphic) SpinsGraphic.DOAnchorPosX(spinsStart.x + freeSpinsSplitDistance, freeSpinsSplitDuration).SetEase(Ease.OutBack);
+    if (freeSplit != null) yield return freeSplit.WaitForCompletion();
+    else yield return new WaitForSeconds(freeSpinsSplitDuration);
+
+    // Count up number in the middle
     if (FreeSpinsAwardedText)
     {
-      FreeSpinsAwardedText.text = spinCount.ToString();
       FreeSpinsAwardedText.gameObject.SetActive(true);
-      FreeSpinsAwardedText.transform.localScale = Vector3.zero;
-      yield return FreeSpinsAwardedText.transform.DOScale(Vector3.one, freeSpinsPopupScaleDuration).SetEase(Ease.OutBack).WaitForCompletion();
+      FreeSpinsAwardedText.alpha = 1f;
+      FreeSpinsAwardedText.transform.localScale = Vector3.one;
+      float countVal = 0f;
+      yield return DOTween.To(() => countVal, v => {
+        countVal = v;
+        FreeSpinsAwardedText.text = Mathf.CeilToInt(v).ToString();
+      }, spinCount, freeSpinsCountDuration).SetEase(Ease.OutQuad).WaitForCompletion();
+      FreeSpinsAwardedText.text = spinCount.ToString();
     }
 
-    yield return new WaitForSeconds(freeSpinsPopupHoldDuration);
+    // Fly number up to logo and fade it out; simultaneously bring FREE and SPINS back together
+    if (FreeSpinsAwardedText && FreeSpinsLogoDisplay)
+    {
+      FreeSpinsAwardedText.transform.DOMove(FreeSpinsLogoDisplay.transform.position, freeSpinsFlyDuration).SetEase(Ease.InCubic);
+      DOTween.To(() => FreeSpinsAwardedText.alpha, v => FreeSpinsAwardedText.alpha = v, 0f, freeSpinsFlyDuration);
+    }
+    if (FreeGraphic) FreeGraphic.DOAnchorPosX(freeStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
+    if (SpinsGraphic) SpinsGraphic.DOAnchorPosX(spinsStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
+    yield return new WaitForSeconds(freeSpinsFlyDuration);
 
-    if (FreeSpinsAwardedText) FreeSpinsAwardedText.gameObject.SetActive(false);
+    yield return new WaitForSeconds(0.5f);
+
+    // Clean up
+    if (FreeSpinsAwardedText)
+    {
+      FreeSpinsAwardedText.gameObject.SetActive(false);
+      FreeSpinsAwardedText.transform.position = countTextStart;
+      FreeSpinsAwardedText.alpha = 1f;
+    }
+    if (FreeGraphic) FreeGraphic.gameObject.SetActive(false);
+    if (SpinsGraphic) SpinsGraphic.gameObject.SetActive(false);
+
     if (MainLogo) MainLogo.SetActive(false);
     if (FreeSpinsLogoCountText) FreeSpinsLogoCountText.text = spinCount.ToString();
     if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(true);
     if (DarkenOverlay) DarkenOverlay.SetActive(false);
-    if (FreeSpinsTriggerText) FreeSpinsTriggerText.SetActive(false);
   }
 
   internal void EndFreeSpinTriggerSequence()
@@ -587,15 +657,11 @@ public class UIManager : MonoBehaviour
     yield return new WaitForSeconds(bonusWinShowDelay);
 
     if (BonusNameGraphicImage) BonusNameGraphicImage.sprite = GetBonusWinTierSprite(tier);
-    if (BonusWinPanel) BonusWinPanel.localScale = Vector3.zero;
     if (BonusWinAmountText) BonusWinAmountText.text = "0.000";
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(true);
+    if (BonusWinPanel) { ImageAnimation panelAnim = BonusWinPanel.GetComponent<ImageAnimation>(); if (panelAnim) panelAnim.StartAnimation(); }
 
     if (audioManager) audioManager.PlayBigBonus();
-    if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.doLoopAnimation = true; BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.StartAnimation(); }
-
-    if (BonusWinPanel) BonusWinPanel.DOScale(Vector3.one, bonusWinScaleDuration).SetEase(Ease.OutBack);
-    yield return new WaitForSeconds(bonusWinScaleDuration);
 
     float bonusWinDisplay = 0f;
     if (BonusWinAmountText)
@@ -620,5 +686,16 @@ public class UIManager : MonoBehaviour
     if (SlideContainer && InfoSlides != null && InfoSlides.Length > 0)
       SlideContainer.sprite = InfoSlides[index];
   }
+
+  // TODO: Add scale animation for BonusWinAmountText — frames/timing TBD with team
+  // TODO: Work on BigWin sequence (similar to BonusWin flow)
+  // TODO: Clarify trigger logic — when to show BonusWin vs BigWin
+  // private IEnumerator DebugBonusWinPreview()
+  // {
+  //   yield return new WaitForSeconds(1.0f);
+  //   yield return StartCoroutine(ShowBonusWinSequence(100, 10));
+  //   yield return new WaitForSeconds(0.5f);
+  //   yield return StartCoroutine(ShowBonusWinSequence(100, 10));
+  // }
 
 }

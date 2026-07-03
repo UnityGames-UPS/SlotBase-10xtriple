@@ -100,11 +100,7 @@ public class SlotBehaviour : MonoBehaviour
   private UIManager uiManager;
 
   [Header("Free Spin Trigger Anticipation")]
-  [SerializeField] private Camera anticipationCamera;
-  [SerializeField] private float anticipationStopDuration = 1.5f;
-  [SerializeField] private float anticipationZoomAmount = 0.8f;
-  [SerializeField] private float anticipationZoomInDuration = 0.6f;
-  [SerializeField] private float anticipationZoomOutDuration = 0.9f;
+  [SerializeField] private float anticipationExtraSpinDuration = 1.5f;
 
   [Header("Free Spin Special Reel")]
   [SerializeField] private GameObject SpecialReelObject;
@@ -284,6 +280,7 @@ public class SlotBehaviour : MonoBehaviour
     StartCoroutine(uiManager.ShowSpinWin(totalFreeSpinWin));
     StartCoroutine(uiManager.ShowBonusWinSequence(totalFreeSpinWin, currentTotalBet));
 
+    IsFreeSpin = false;
     if (WasAutoSpinOn)
     {
       WasAutoSpinOn = false;
@@ -293,7 +290,6 @@ public class SlotBehaviour : MonoBehaviour
     {
       ToggleButtonGrp(true);
     }
-    IsFreeSpin = false;
   }
   #endregion
 
@@ -675,12 +671,26 @@ public class SlotBehaviour : MonoBehaviour
       bool isLastReel = i == numberOfSlots - 1;
       if (willTriggerFreeSpin && isLastReel)
       {
-        StartCoroutine(AnticipationZoom());
-        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle, anticipationStopDuration);
+        uiManager.StartAnticipationZoom(anticipationExtraSpinDuration);
+        yield return new WaitForSeconds(anticipationExtraSpinDuration);
+        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
       }
       else
       {
         yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
+        if (willTriggerFreeSpin)
+        {
+          bool reelHasScatter = false;
+          for (int row = 0; row < numberOfRows; row++)
+          {
+            if (int.Parse(SocketManager.ResultData.matrix[row][i]) == 10)
+            {
+              reelHasScatter = true;
+              break;
+            }
+          }
+          if (reelHasScatter) uiManager.ScatterAnticipationPunch();
+        }
       }
     }
     StopSpinToggle = false;
@@ -716,9 +726,13 @@ public class SlotBehaviour : MonoBehaviour
       {
         if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10)
         {
-          if (!_animateAllSymbols)
-            StartGameAnimation(TempImages[col].slotImages[row].gameObject);
-          anyScatter = true;
+          bool isDecorativeRow = row == 0 || row == numberOfRows - 1;
+          if (!isDecorativeRow)
+          {
+            if (!_animateAllSymbols)
+              StartGameAnimation(TempImages[col].slotImages[row].gameObject);
+            anyScatter = true;
+          }
         }
       }
     }
@@ -794,7 +808,7 @@ public class SlotBehaviour : MonoBehaviour
         {
           for (int col = 0; col < numberOfSlots; col++)
           {
-            if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10)
+            if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10 && row != 0 && row != numberOfRows - 1)
             {
               ImageAnimation anim = TempImages[col].slotImages[row].GetComponent<ImageAnimation>();
               if (anim != null)
@@ -931,6 +945,7 @@ public class SlotBehaviour : MonoBehaviour
   {
     bool active = toggle && !IsAutoSpin;
     if (Spin_Button) Spin_Button.interactable = toggle ? active : true;
+    if (AutoSpin_Button) AutoSpin_Button.interactable = !IsFreeSpin && (toggle || IsAutoSpin);
     if (MaxBet_Button) MaxBet_Button.interactable = active;
     if (TBetMinus_Button) TBetMinus_Button.interactable = active;
     if (TBetPlus_Button) TBetPlus_Button.interactable = active;
@@ -1085,8 +1100,8 @@ public class SlotBehaviour : MonoBehaviour
         _specialReelImages[i].transform.localPosition = pos;
       }
     }
-    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, 0);
-    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.5f).SetEase(Ease.OutCubic);
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY - IconSizeFactor);
+    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad);
   }
 
   private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
@@ -1109,8 +1124,8 @@ public class SlotBehaviour : MonoBehaviour
       }
     }
 
-    slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, 0);
-    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, duration).SetEase(Ease.OutCubic);
+    slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, topSlotImageY - IconSizeFactor);
+    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad);
     if (!isStop)
     {
       yield return new WaitForSeconds(0.2f);
@@ -1121,22 +1136,6 @@ public class SlotBehaviour : MonoBehaviour
     }
   }
 
-  private IEnumerator AnticipationZoom()
-  {
-    if (!anticipationCamera) yield break;
-    if (anticipationCamera.orthographic)
-    {
-      float original = anticipationCamera.orthographicSize;
-      yield return anticipationCamera.DOOrthoSize(original * anticipationZoomAmount, anticipationZoomInDuration).SetEase(Ease.OutSine).WaitForCompletion();
-      yield return anticipationCamera.DOOrthoSize(original, anticipationZoomOutDuration).SetEase(Ease.OutElastic).WaitForCompletion();
-    }
-    else
-    {
-      float original = anticipationCamera.fieldOfView;
-      yield return anticipationCamera.DOFieldOfView(original * anticipationZoomAmount, anticipationZoomInDuration).SetEase(Ease.OutSine).WaitForCompletion();
-      yield return anticipationCamera.DOFieldOfView(original, anticipationZoomOutDuration).SetEase(Ease.OutElastic).WaitForCompletion();
-    }
-  }
 
 
   private void KillAllTweens()
