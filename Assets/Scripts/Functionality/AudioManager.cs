@@ -135,7 +135,7 @@ public class AudioManager : MonoBehaviour
     {
         if (spinSource == null || clipSpinLoop == null) return;
         spinSource.clip = clipSpinLoop;
-        spinSource.loop = true;
+        spinSource.loop = false;
         spinSource.volume = _sfxEnabled ? 1f : 0f;
         spinSource.Play();
     }

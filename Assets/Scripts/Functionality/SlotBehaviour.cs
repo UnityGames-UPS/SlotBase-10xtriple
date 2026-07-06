@@ -229,7 +229,7 @@ public class SlotBehaviour : MonoBehaviour
     while (IsAutoSpin)
     {
       yield return new WaitUntil(() => !CheckPopups && !IsSpinning);
-      if (currentBalance < currentTotalBet) { StopAutoSpin(); break; }
+      if (currentBalance < currentTotalBet) { uiManager.LowBalPopup(); StopAutoSpin(); break; }
       StartSlots(true);
       yield return new WaitUntil(() => !IsSpinning);
       yield return new WaitForSeconds(SpinDelay);
@@ -603,12 +603,14 @@ public class SlotBehaviour : MonoBehaviour
     {
       InitializeSpecialReelTweening();
       yield return new WaitForSeconds(2f);
+      if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
         InitializeTweening(Slot_Transform[i], i);
     }
     else if (IsFreeSpin)
     {
       InitializeSpecialReelTweening();
+      if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
         InitializeTweening(Slot_Transform[i], i);
     }
@@ -1078,7 +1080,6 @@ public class SlotBehaviour : MonoBehaviour
   private void InitializeSpecialReelTweening()
   {
     if (!SpecialReelTransform) return;
-    if (audioController) audioController.PlaySpecialReelSpin();
     SpecialReelTransform.DOKill();
 
     List<Image> imageList = new List<Image>();

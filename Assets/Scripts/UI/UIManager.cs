@@ -263,7 +263,7 @@ public class UIManager : MonoBehaviour
     });
 
     if (Home_Button) Home_Button.onClick.RemoveAllListeners();
-    if (Home_Button) Home_Button.onClick.AddListener(CallOnExitFunction);
+    if (Home_Button) Home_Button.onClick.AddListener(delegate { OpenPopup(QuitPopup_Object); });
 
     if (NoQuit_Button) NoQuit_Button.onClick.RemoveAllListeners();
     if (NoQuit_Button) NoQuit_Button.onClick.AddListener(delegate
@@ -556,6 +556,7 @@ public class UIManager : MonoBehaviour
   internal IEnumerator ShowSpinWin(double winAmount)
   {
     if (winAmount <= 0) yield break;
+    if (audioManager) audioManager.PlayNormalIcon();
     if (SpinWinPanel)
     {
       SpinWinPanel.SetActive(true);
