@@ -62,7 +62,9 @@ public class UIManager : MonoBehaviour
   [SerializeField] private TMP_Text BigWinAmountText;
   [SerializeField] private float bigWinShowDelay = 0f;
   [SerializeField] private float bigWinCountDuration = 1.5f;
-  [SerializeField] private float bigWinHoldDuration = 2f;
+  [SerializeField] private float bigWinHoldDuration = 6.5f;
+  [SerializeField] private int bigWinAmountShowFrame = 105;
+  [SerializeField] private int bigWinAmountHideFrame = 175;
 
   [Header("Bonus Win Sequence")]
   [SerializeField] private GameObject BonusWinSequencePanel;
@@ -696,29 +698,62 @@ public class UIManager : MonoBehaviour
   {
     yield return new WaitForSeconds(bigWinShowDelay);
 
-    if (BigWinAmountText) BigWinAmountText.text = "0.000";
+    if (BigWinAmountText) { BigWinAmountText.text = "0.000"; BigWinAmountText.gameObject.SetActive(false); }
     if (BigWinSequencePanel) BigWinSequencePanel.SetActive(true);
-    if (BigWinPanel) { ImageAnimation panelAnim = BigWinPanel.GetComponent<ImageAnimation>(); if (panelAnim) panelAnim.StartAnimation(); }
-    if (audioManager) audioManager.PlaySuperBonusWinner();
-    if (BigWinAmountPanel)
+    // BigWinAmountPanel scale-in disabled — board is now baked into the new BigWinPanel animation.
+    // Deactivated in-scene instead of removed in case it's needed again later.
+    // if (BigWinAmountPanel)
+    // {
+    //   Vector3 finalScale = BigWinAmountPanel.localScale;
+    //   BigWinAmountPanel.localScale = Vector3.zero;
+    //   BigWinAmountPanel.DOScale(finalScale, 0.6f).SetEase(Ease.OutBack).SetDelay(0.2f);
+    // }
+    ImageAnimation panelAnim = null;
+    if (BigWinPanel)
     {
-      Vector3 finalScale = BigWinAmountPanel.localScale;
-      BigWinAmountPanel.localScale = Vector3.zero;
-      BigWinAmountPanel.DOScale(finalScale, 0.6f).SetEase(Ease.OutBack).SetDelay(0.2f);
+      panelAnim = BigWinPanel.GetComponent<ImageAnimation>();
+      if (panelAnim) panelAnim.StartAnimation();
     }
+    if (audioManager) audioManager.PlaySuperBonusWinner();
 
-    float bigWinDisplay = 0f;
-    if (BigWinAmountText)
-      yield return DOTween.To(() => bigWinDisplay, v => { bigWinDisplay = v; BigWinAmountText.text = v.ToString("F3"); },
-        (float)totalWin, bigWinCountDuration).WaitForCompletion();
-    else
-      yield return new WaitForSeconds(bigWinCountDuration);
+    StartCoroutine(BigWinAmountRoutine(panelAnim, totalWin));
 
-    yield return new WaitForSeconds(bigWinHoldDuration);
+    yield return new WaitForSeconds(bigWinCountDuration + bigWinHoldDuration);
 
     if (BigWinSequencePanel) BigWinSequencePanel.SetActive(false);
   }
 
+  private IEnumerator BigWinAmountRoutine(ImageAnimation panelAnim, double totalWin)
+  {
+    if (BigWinAmountText == null) yield break;
+
+    float showAt = 0f;
+    float hideAt = 0f;
+    if (panelAnim != null && panelAnim.textureArray != null && panelAnim.textureArray.Count > 0)
+    {
+      float perFrameDelay = panelAnim.GetTotalDuration() / panelAnim.textureArray.Count;
+      showAt = perFrameDelay * bigWinAmountShowFrame;
+      hideAt = perFrameDelay * bigWinAmountHideFrame;
+    }
+
+    yield return new WaitForSeconds(showAt);
+
+    BigWinAmountText.text = "0.000";
+    BigWinAmountText.gameObject.SetActive(true);
+    Vector3 finalTextScale = BigWinAmountText.rectTransform.localScale;
+    BigWinAmountText.rectTransform.localScale = Vector3.zero;
+    BigWinAmountText.rectTransform.DOScale(finalTextScale, 0.6f).SetEase(Ease.OutBack);
+
+    float bigWinDisplay = 0f;
+    Tween countTween = DOTween.To(() => bigWinDisplay, v => { bigWinDisplay = v; BigWinAmountText.text = v.ToString("F3"); },
+      (float)totalWin, bigWinCountDuration);
+
+    yield return new WaitForSeconds(Mathf.Max(0f, hideAt - showAt));
+
+    countTween.Kill();
+    BigWinAmountText.rectTransform.DOKill();
+    BigWinAmountText.gameObject.SetActive(false);
+  }
 
   // TODO: Add scale animation for BonusWinAmountText — frames/timing TBD with team
   // private IEnumerator DebugBonusWinPreview()
