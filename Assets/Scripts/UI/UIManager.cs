@@ -34,6 +34,7 @@ public class UIManager : MonoBehaviour
   [SerializeField] private TMP_Text Balance_text;
   [SerializeField] private TMP_Text TotalBet_text;
   [SerializeField] private TMP_Text TotalWin_text;
+  [SerializeField] private TMP_Text PayoutText;
 
   [Header("Intro")]
   [SerializeField] private RectTransform GameContent;
@@ -96,6 +97,7 @@ public class UIManager : MonoBehaviour
   private List<double> betAmounts;
   internal int BetCount => betAmounts?.Count ?? 0;
   internal double GetBetAmount(int index) => betAmounts[index];
+  private double maxPayoutMultiplier;
 
   [Header("Information UI")]
   [SerializeField]
@@ -314,15 +316,31 @@ public class UIManager : MonoBehaviour
 
   private IEnumerator PlayIntro()
   {
+    GameObject freeSpinReel = slotManager ? slotManager.FreeSpinSlotMachine : null;
+    CanvasGroup freeSpinReelCanvasGroup = null;
+    if (freeSpinReel)
+    {
+      freeSpinReelCanvasGroup = freeSpinReel.GetComponent<CanvasGroup>();
+      if (!freeSpinReelCanvasGroup) freeSpinReelCanvasGroup = freeSpinReel.AddComponent<CanvasGroup>();
+      freeSpinReelCanvasGroup.alpha = 1f;
+      freeSpinReel.SetActive(true);
+    }
+
     if (GameContent)
     {
       Vector3 fullScale = GameContent.localScale;
-      GameContent.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+      GameContent.localScale = new Vector3(0.6f, 0.6f, 0.6f);
       yield return DOTween.Sequence()
-        .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutCubic))
-        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.35f).SetEase(Ease.InOutCubic))
-        .Append(GameContent.DOScale(fullScale, 0.45f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.7f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.5f).SetEase(Ease.InOutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.65f).SetEase(Ease.OutCubic))
         .WaitForCompletion();
+    }
+
+    if (freeSpinReelCanvasGroup)
+    {
+      yield return freeSpinReelCanvasGroup.DOFade(0f, 0.4f).WaitForCompletion();
+      freeSpinReel.SetActive(false);
     }
   }
 
@@ -465,7 +483,7 @@ public class UIManager : MonoBehaviour
     GameContent.DOScale(Vector3.one * _anticipationZoomTarget, duration).SetEase(Ease.Linear);
   }
 
-  private void ResetAnticipationZoom()
+  internal void ResetAnticipationZoom()
   {
     _anticipationPunchStep = 0;
     if (!GameContent) return;
@@ -612,11 +630,23 @@ public class UIManager : MonoBehaviour
   internal void InitialiseUI(List<double> bets, List<Symbol> symbols)
   {
     betAmounts = bets;
+
+    maxPayoutMultiplier = 0;
+    if (symbols != null)
+    {
+      foreach (Symbol symbol in symbols)
+      {
+        if (symbol.multiplier == null) continue;
+        foreach (double m in symbol.multiplier)
+          if (m > maxPayoutMultiplier) maxPayoutMultiplier = m;
+      }
+    }
   }
 
   internal void SetBet(double totalBet)
   {
     UpdateBetDisplay(totalBet);
+    if (PayoutText) PayoutText.text = (maxPayoutMultiplier * totalBet).ToString("F2");
   }
 
   internal void ShowTicker()

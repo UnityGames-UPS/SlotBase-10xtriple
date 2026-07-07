@@ -110,7 +110,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
   [SerializeField] private GameObject LastReelGlow;
-  [SerializeField] private GameObject FreeSpinSlotMachine;
+  [SerializeField] internal GameObject FreeSpinSlotMachine;
 
   int tweenHeight = 0;
   private float topSlotImageY = 3393.2f;
@@ -656,9 +656,7 @@ public class SlotBehaviour : MonoBehaviour
       TempImages[j].slotImages[numberOfRows - 1].rectTransform.localEulerAngles = new Vector3(-edgeRotation, 0, 0);
     }
 
-    float spinElapsed = Time.time - spinStartTime;
-    if (spinElapsed < minSpinDuration)
-      yield return new WaitForSeconds(minSpinDuration - spinElapsed);
+    yield return new WaitUntil(() => StopSpinToggle || Time.time - spinStartTime >= minSpinDuration);
 
     for (int i = 0; i < 5; i++)
     {
@@ -670,36 +668,68 @@ public class SlotBehaviour : MonoBehaviour
     }
 
     bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin && !IsFreeSpin;
+
+    // Precompute which reel (if any) contains the scatter that completes the count to 3,
+    // counting left-to-right across non-decorative rows only.
+    int specialScatterReelIndex = -1;
+    if (!IsFreeSpin)
+    {
+      int scatterTally = 0;
+      for (int col = 0; col < numberOfSlots; col++)
+      {
+        for (int row = 1; row < numberOfRows - 1; row++)
+        {
+          if (int.Parse(SocketManager.ResultData.matrix[row][col]) == 10)
+            scatterTally++;
+        }
+        if (specialScatterReelIndex == -1 && scatterTally >= 3)
+          specialScatterReelIndex = col;
+      }
+    }
+
+    bool lastReelPunched = false;
     for (int i = 0; i < numberOfSlots; i++)
     {
       if (IsFreeSpin && i == 1)
         StopSpecialReelTweening();
-      bool isLastReel = i == numberOfSlots - 1;
-      if (willTriggerFreeSpin && isLastReel)
+
+      if (i == specialScatterReelIndex)
       {
-        if (LastReelGlow) LastReelGlow.SetActive(true);
+        GameObject anticipationGlow = i == 1 ? MiddleReelGlow : (i == numberOfSlots - 1 ? LastReelGlow : null);
+        Debug.Log("[ScatterAnticipation DEBUG] Entering special reel " + i + ", setting glow ON");
+        if (anticipationGlow) anticipationGlow.SetActive(true);
         uiManager.StartAnticipationZoom(anticipationExtraSpinDuration);
         yield return new WaitForSeconds(anticipationExtraSpinDuration);
+        Debug.Log("[ScatterAnticipation DEBUG] Anticipation wait complete, stopping reel " + i);
         yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
-        if (LastReelGlow) LastReelGlow.SetActive(false);
+        Debug.Log("[ScatterAnticipation DEBUG] StopTweening complete, setting glow OFF");
+        if (anticipationGlow) anticipationGlow.SetActive(false);
+        Debug.Log("[ScatterAnticipation DEBUG] Glow set OFF successfully");
       }
       else
       {
         yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
-        if (willTriggerFreeSpin)
+        if (!IsFreeSpin && (specialScatterReelIndex == -1 || i < specialScatterReelIndex))
         {
-          bool reelHasScatter = false;
-          for (int row = 0; row < numberOfRows; row++)
+          int reelScatterCount = 0;
+          for (int row = 1; row < numberOfRows - 1; row++)
           {
             if (int.Parse(SocketManager.ResultData.matrix[row][i]) == 10)
-            {
-              reelHasScatter = true;
-              break;
-            }
+              reelScatterCount++;
           }
-          if (reelHasScatter) uiManager.ScatterAnticipationPunch();
+          for (int p = 0; p < reelScatterCount; p++)
+            uiManager.ScatterAnticipationPunch();
+          if (reelScatterCount > 0 && i == numberOfSlots - 1)
+            lastReelPunched = true;
         }
       }
+    }
+
+    if (!willTriggerFreeSpin)
+    {
+      if (lastReelPunched)
+        yield return new WaitForSeconds(0.2f);
+      uiManager.ResetAnticipationZoom();
     }
     StopSpinToggle = false;
     yield return alltweens[^1].WaitForCompletion();
