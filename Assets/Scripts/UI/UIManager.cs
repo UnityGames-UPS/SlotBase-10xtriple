@@ -54,7 +54,9 @@ public class UIManager : MonoBehaviour
   [SerializeField] private float freeSpinsSplitDuration = 0.4f;
   [SerializeField] private float freeSpinsCountDuration = 1.0f;
   [SerializeField] private float freeSpinsFlyDuration = 0.6f;
-  [SerializeField] private float freeSpinsSplitDistance = 300f;
+  [SerializeField] private float freeSpinsSplitDistance = 250f;
+  [SerializeField] private float freeSpinsCountHoldDuration = 0.5f;
+  [SerializeField] private float freeSpinsCountFadeDuration = 0.3f;
 
   [Header("Big Win Sequence")]
   [SerializeField] private GameObject BigWinSequencePanel;
@@ -519,18 +521,19 @@ public class UIManager : MonoBehaviour
       yield return new WaitForSeconds(freeSpinsCountDuration);
     }
 
-    // Fly number up to logo and fade it out; simultaneously bring FREE and SPINS back together
+    // Fly number up to logo; simultaneously bring FREE and SPINS back together
     Image countImage = FreeSpinsCountAnimation ? FreeSpinsCountAnimation.GetComponent<Image>() : null;
     if (FreeSpinsCountAnimation && FreeSpinsLogoDisplay)
     {
       FreeSpinsCountAnimation.transform.DOMove(FreeSpinsLogoDisplay.transform.position, freeSpinsFlyDuration).SetEase(Ease.InCubic);
-      if (countImage) countImage.DOFade(0f, freeSpinsFlyDuration);
     }
     if (FreeGraphic) FreeGraphic.DOAnchorPosX(freeStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
     if (SpinsGraphic) SpinsGraphic.DOAnchorPosX(spinsStart.x, freeSpinsFlyDuration).SetEase(Ease.InBack);
     yield return new WaitForSeconds(freeSpinsFlyDuration);
 
-    yield return new WaitForSeconds(0.5f);
+    // Hold at the logo, then fade out
+    yield return new WaitForSeconds(freeSpinsCountHoldDuration);
+    if (countImage) yield return countImage.DOFade(0f, freeSpinsCountFadeDuration).WaitForCompletion();
 
     // Clean up
     if (FreeSpinsCountAnimation)

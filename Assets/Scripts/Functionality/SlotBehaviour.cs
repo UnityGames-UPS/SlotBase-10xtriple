@@ -78,6 +78,7 @@ public class SlotBehaviour : MonoBehaviour
   private Sprite[] Scatter_Sprite;
   [SerializeField]
   private Sprite[] ScatterTrigger_Sprite;
+  private static readonly Vector2 ScatterSymbolBaseSize = new Vector2(250f, 300f);
 
   [Header("Debug")]
   [SerializeField] private bool _animateAllSymbols = true;
@@ -645,6 +646,7 @@ public class SlotBehaviour : MonoBehaviour
           PopulateAnimationSprites(animScript, resultNum);
         }
         TempImages[j].slotImages[i].sprite = myImages[resultNum];
+        TempImages[j].slotImages[i].rectTransform.sizeDelta = ScatterSymbolBaseSize;
       }
     }
 
@@ -859,6 +861,7 @@ public class SlotBehaviour : MonoBehaviour
                 anim.doLoopAnimation = true;
                 anim.StartAnimation();
               }
+              TempImages[col].slotImages[row].rectTransform.sizeDelta = ScatterSymbolBaseSize * 1.5f;
             }
           }
         }
