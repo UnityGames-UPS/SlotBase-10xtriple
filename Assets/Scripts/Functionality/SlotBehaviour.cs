@@ -247,7 +247,16 @@ public class SlotBehaviour : MonoBehaviour
     {
       uiManager.UpdateFreeSpinsRemaining(spins);
       IsFreeSpin = true;
-      if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(true);
+      if (FreeSpinSlotMachine)
+      {
+        CanvasGroup freeSpinSlotMachineCanvasGroup = FreeSpinSlotMachine.GetComponent<CanvasGroup>();
+        if (freeSpinSlotMachineCanvasGroup)
+        {
+          freeSpinSlotMachineCanvasGroup.DOKill();
+          freeSpinSlotMachineCanvasGroup.alpha = 1f;
+        }
+        FreeSpinSlotMachine.SetActive(true);
+      }
       ToggleButtonGrp(false);
 
       if (FreeSpinRoutine != null)

@@ -129,10 +129,10 @@ TextureImporter:
       name: Asset 128_0
       rect:
         serializedVersion: 2
-        x: 132
-        y: 129
-        width: 1302
-        height: 614
+        x: 112
+        y: 109
+        width: 1342
+        height: 654
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}

@@ -267,12 +267,17 @@ private void OnError(Error err)
       // If waiting for pong, and timeout passed
       if (waitingForPong)
       {
+        missedPongs++;
+        Debug.LogWarning($"⚠️ Pong missed #{missedPongs}/{MaxMissedPongs}");
+
         if (missedPongs == 2)
         {
           uiManager.ReconnectionPopup(missedPongs, MaxMissedPongs);
         }
-        missedPongs++;
-        Debug.LogWarning($"⚠️ Pong missed #{missedPongs}/{MaxMissedPongs}");
+        else
+        {
+          uiManager.UpdateReconnectingAttempt(missedPongs, MaxMissedPongs);
+        }
 
         if (missedPongs >= MaxMissedPongs)
         {

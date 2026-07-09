@@ -173,6 +173,8 @@ public class UIManager : MonoBehaviour
   [SerializeField]
   private TMP_Text ReconnectingAttemptText;
   [SerializeField]
+  private TMP_Text ReconnectingAttemptAmount;
+  [SerializeField]
   private GameObject ReconnectPopup_Object;
 
   [Header("LowBalance Popup")]
@@ -355,6 +357,7 @@ public class UIManager : MonoBehaviour
   {
     if (!isExit)
     {
+      if (ReconnectPopup_Object) ReconnectPopup_Object.SetActive(false);
       OpenPopup(DisconnectPopup_Object);
     }
   }
@@ -362,8 +365,13 @@ public class UIManager : MonoBehaviour
   internal void ReconnectionPopup(int attempt, int max)
   {
     if (ReconnectingText) ReconnectingText.text = "Reconnecting...";
-    if (ReconnectingAttemptText) ReconnectingAttemptText.text = $"{attempt}/{max}";
+    UpdateReconnectingAttempt(attempt, max);
     OpenPopup(ReconnectPopup_Object);
+  }
+
+  internal void UpdateReconnectingAttempt(int attempt, int max)
+  {
+    if (ReconnectingAttemptAmount) ReconnectingAttemptAmount.text = $"{attempt}/{max}";
   }
 
   internal void CheckAndClosePopups()
