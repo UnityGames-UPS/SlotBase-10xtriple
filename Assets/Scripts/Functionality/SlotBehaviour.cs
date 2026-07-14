@@ -166,6 +166,12 @@ public class SlotBehaviour : MonoBehaviour
     { 3, 3, 3 }
   };
 
+  private void Awake()
+  {
+    ToggleButtonGrp(false);
+    if (Spin_Button) Spin_Button.interactable = false;
+  }
+
   private void Start()
   {
     IsAutoSpin = false;
@@ -1013,7 +1019,7 @@ public class SlotBehaviour : MonoBehaviour
   }
 
 
-  void ToggleButtonGrp(bool toggle)
+  internal void ToggleButtonGrp(bool toggle)
   {
     bool active = toggle && !IsAutoSpin;
     if (Spin_Button) Spin_Button.interactable = toggle ? active : true;

@@ -335,9 +335,9 @@ public class UIManager : MonoBehaviour
       Vector3 fullScale = GameContent.localScale;
       GameContent.localScale = new Vector3(0.6f, 0.6f, 0.6f);
       yield return DOTween.Sequence()
-        .Append(GameContent.DOScale(fullScale, 0.7f).SetEase(Ease.OutCubic))
-        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.5f).SetEase(Ease.InOutCubic))
-        .Append(GameContent.DOScale(fullScale, 0.65f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.35f).SetEase(Ease.InOutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.45f).SetEase(Ease.OutCubic))
         .WaitForCompletion();
     }
 
@@ -346,6 +346,8 @@ public class UIManager : MonoBehaviour
       yield return freeSpinReelCanvasGroup.DOFade(0f, 0.4f).WaitForCompletion();
       freeSpinReel.SetActive(false);
     }
+
+    if (slotManager) slotManager.ToggleButtonGrp(true);
   }
 
   internal void LowBalPopup()
