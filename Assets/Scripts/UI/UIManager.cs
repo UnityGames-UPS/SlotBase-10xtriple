@@ -370,9 +370,9 @@ public class UIManager : MonoBehaviour
       Vector3 fullScale = GameContent.localScale;
       GameContent.localScale = new Vector3(0.6f, 0.6f, 0.6f);
       yield return DOTween.Sequence()
-        .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutCubic))
-        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.35f).SetEase(Ease.InOutCubic))
-        .Append(GameContent.DOScale(fullScale, 0.45f).SetEase(Ease.OutBack))
+        .Append(GameContent.DOScale(fullScale, 0.6f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.4f).SetEase(Ease.InOutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutBack, 2.5f))
         .WaitForCompletion();
     }
 
@@ -628,6 +628,7 @@ public class UIManager : MonoBehaviour
   private IEnumerator SpinWinRoutine(double winAmount)
   {
     if (winAmount <= 0) yield break;
+    if (_bigWinActive || _bonusWinActive) yield break;
     _spinWinActive = true;
     if (audioManager) audioManager.PlayNormalIcon();
     if (SpinWinPanel)

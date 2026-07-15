@@ -159,6 +159,7 @@ public class SlotBehaviour : MonoBehaviour
   private float minSpinDuration = 1.5f;
   internal bool WasAutoSpinOn;
   private bool _isFirstFreeSpin;
+  private int lastWinLineCount = 0;
   internal bool socketConnected = false;
   private int[,] initialMatrix = new int[,]
   {
@@ -269,6 +270,8 @@ public class SlotBehaviour : MonoBehaviour
           freeSpinSlotMachineCanvasGroup.alpha = 1f;
         }
         FreeSpinSlotMachine.SetActive(true);
+        ImageAnimation freeSpinReelAnim = FreeSpinSlotMachine.GetComponent<ImageAnimation>();
+        if (freeSpinReelAnim) freeSpinReelAnim.StartAnimation();
       }
       ToggleButtonGrp(false);
 
@@ -292,7 +295,10 @@ public class SlotBehaviour : MonoBehaviour
       _isFirstFreeSpin = isFirstFreeSpin;
       StartSlots();
       yield return tweenroutine;
-      yield return new WaitForSeconds(SpinDelay);
+      if (SocketManager.ResultData.payload.winAmount > 0)
+        yield return WaitForFreeSpinWinDisplay();
+      else
+        yield return new WaitForSeconds(SpinDelay);
       isFreeSpinActive = SocketManager.ResultData.payload.isFreeSpinActive;
       uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
       isFirstFreeSpin = false;
@@ -304,8 +310,10 @@ public class SlotBehaviour : MonoBehaviour
     uiManager.EndFreeSpinTriggerSequence();
 
     double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
-    uiManager.PlaySpinWin(totalFreeSpinWin);
     uiManager.PlayBonusWinSequence(totalFreeSpinWin, currentTotalBet);
+    uiManager.PlaySpinWin(totalFreeSpinWin);
+    if (totalFreeSpinWin > 0)
+      yield return WaitForFreeSpinWinDisplay();
 
     IsFreeSpin = false;
     if (WasAutoSpinOn)
@@ -317,6 +325,14 @@ public class SlotBehaviour : MonoBehaviour
     {
       ToggleButtonGrp(true);
     }
+  }
+
+  // Waits for the win popup and, if there were winning paylines, for each to get its full display time.
+  private IEnumerator WaitForFreeSpinWinDisplay()
+  {
+    float paylineCycleDuration = lastWinLineCount * paylineHoldDuration;
+    float waitStart = Time.time;
+    yield return new WaitUntil(() => !uiManager.IsWinSequenceActive && Time.time - waitStart >= paylineCycleDuration);
   }
   #endregion
 
@@ -699,6 +715,12 @@ public class SlotBehaviour : MonoBehaviour
 
     bool willTriggerFreeSpin = SocketManager.ResultData.features.freeSpin.isFreeSpin && !IsFreeSpin;
 
+    if (willTriggerFreeSpin && IsAutoSpin && AutoSpinRoutine != null)
+    {
+      StopCoroutine(AutoSpinRoutine);
+      AutoSpinRoutine = null;
+    }
+
     // Precompute which reel (if any) contains the scatter that completes the count to 3,
     // counting left-to-right across non-decorative rows only.
     int specialScatterReelIndex = -1;
@@ -823,7 +845,12 @@ public class SlotBehaviour : MonoBehaviour
       {
         winLine.Add(item.line);
       }
+      lastWinLineCount = winLine.Count;
       CheckPayoutLineBackend(winLine, SocketManager.ResultData.features.jackpot.amount);
+    }
+    else
+    {
+      lastWinLineCount = 0;
     }
 
     CheckPopups = true;
@@ -1154,6 +1181,7 @@ public class SlotBehaviour : MonoBehaviour
   {
     if (!SpecialReelTransform) return;
     SpecialReelTransform.DOKill();
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY);
 
     List<Image> imageList = new List<Image>();
     foreach (Image img in SpecialReelTransform.GetComponentsInChildren<Image>())
