@@ -87,6 +87,16 @@ public class UIManager : MonoBehaviour
   private const double MegaWinThreshold = 6;
   private const double SuperWinThreshold = 10;
 
+  private bool _spinWinActive;
+  private bool _bonusWinActive;
+  private bool _bigWinActive;
+  internal bool IsWinSequenceActive => _spinWinActive || _bonusWinActive || _bigWinActive;
+
+  private Coroutine _spinWinCoroutine;
+  private Coroutine _bonusWinCoroutine;
+  private Coroutine _bigWinCoroutine;
+  private Coroutine _bigWinAmountCoroutine;
+
   [Header("Ticker UI")]
   [SerializeField] private RectTransform TickerContainer;
   [SerializeField] private TMP_Text TickerText;
@@ -100,6 +110,32 @@ public class UIManager : MonoBehaviour
   internal int BetCount => betAmounts?.Count ?? 0;
   internal double GetBetAmount(int index) => betAmounts[index];
   private double maxPayoutMultiplier;
+  private readonly Dictionary<int, double> symbolPayoutMultipliers = new Dictionary<int, double>();
+
+  [Header("Symbol Payout Info Slide")]
+  [SerializeField] private GameObject SymbolPayoutOverlay;
+  [SerializeField] private int symbolPayoutSlideIndex = -1;
+  [SerializeField] private TMP_Text SingleBARPayoutText;
+  [SerializeField] private TMP_Text DoubleBARPayoutText;
+  [SerializeField] private TMP_Text TripleBARPayoutText;
+  [SerializeField] private TMP_Text BellPayoutText;
+  [SerializeField] private TMP_Text Red7PayoutText;
+  [SerializeField] private TMP_Text Wild2xPayoutText;
+  [SerializeField] private TMP_Text Wild3xPayoutText;
+  [SerializeField] private TMP_Text Wild5xPayoutText;
+  [SerializeField] private TMP_Text Wild10xPayoutText;
+
+  [Header("Wild Combination Payout Info Slide")]
+  [SerializeField] private GameObject WildComboPayoutOverlay;
+  [SerializeField] private int wildComboPayoutSlideIndex = -1;
+  [SerializeField] private TMP_Text WildCombo3PayoutText;
+  [SerializeField] private TMP_Text WildCombo5PayoutText;
+  [SerializeField] private TMP_Text WildCombo10PayoutText;
+
+  // Not provided by the live backend - sourced from txt_config.json wildRules.mixedWildPayouts
+  private const double WildCombo3Payout = 8;
+  private const double WildCombo5Payout = 15;
+  private const double WildCombo10Payout = 50;
 
   [Header("Information UI")]
   [SerializeField]
@@ -208,7 +244,6 @@ public class UIManager : MonoBehaviour
 
   private void Start()
   {
-    StartCoroutine(PlayIntro());
     // StartCoroutine(DebugBonusWinPreview());
 
     if (Menu_Button) Menu_Button.onClick.RemoveAllListeners();
@@ -318,7 +353,7 @@ public class UIManager : MonoBehaviour
     if (FreeSpinsLogoDisplay) FreeSpinsLogoDisplay.SetActive(false);
   }
 
-  private IEnumerator PlayIntro()
+  internal IEnumerator PlayIntro()
   {
     GameObject freeSpinReel = slotManager ? slotManager.FreeSpinSlotMachine : null;
     CanvasGroup freeSpinReelCanvasGroup = null;
@@ -337,7 +372,7 @@ public class UIManager : MonoBehaviour
       yield return DOTween.Sequence()
         .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutCubic))
         .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.35f).SetEase(Ease.InOutCubic))
-        .Append(GameContent.DOScale(fullScale, 0.45f).SetEase(Ease.OutCubic))
+        .Append(GameContent.DOScale(fullScale, 0.45f).SetEase(Ease.OutBack))
         .WaitForCompletion();
     }
 
@@ -584,9 +619,16 @@ public class UIManager : MonoBehaviour
       });
   }
 
-  internal IEnumerator ShowSpinWin(double winAmount)
+  internal void PlaySpinWin(double winAmount)
+  {
+    if (_spinWinCoroutine != null) StopCoroutine(_spinWinCoroutine);
+    _spinWinCoroutine = StartCoroutine(SpinWinRoutine(winAmount));
+  }
+
+  private IEnumerator SpinWinRoutine(double winAmount)
   {
     if (winAmount <= 0) yield break;
+    _spinWinActive = true;
     if (audioManager) audioManager.PlayNormalIcon();
     if (SpinWinPanel)
     {
@@ -601,13 +643,19 @@ public class UIManager : MonoBehaviour
       SpinWinCoinSplashAnim.StartAnimation();
     }
     float display = 0f;
-    if (TotalWin_text) TotalWin_text.text = "0.000";
-    if (TotalWin_text) DOTween.To(() => display, v => { TotalWin_text.text = v.ToString("F3"); }, (float)winAmount, spinWinCountDuration);
+    if (TotalWin_text)
+    {
+      TotalWin_text.text = "0.000";
+      DOTween.To(() => display, v => { TotalWin_text.text = v.ToString("F3"); }, (float)winAmount, spinWinCountDuration)
+        .SetTarget(TotalWin_text);
+    }
     if (SpinWinText)
       yield return DOTween.To(() => display, v => { display = v; SpinWinText.text = v.ToString("F3"); },
-        (float)winAmount, spinWinCountDuration).WaitForCompletion();
+        (float)winAmount, spinWinCountDuration).SetTarget(SpinWinText).WaitForCompletion();
     yield return new WaitForSeconds(0.5f);
     HideSpinWin();
+    _spinWinActive = false;
+    _spinWinCoroutine = null;
   }
 
   internal void HideSpinWin()
@@ -645,13 +693,18 @@ public class UIManager : MonoBehaviour
     betAmounts = bets;
 
     maxPayoutMultiplier = 0;
+    symbolPayoutMultipliers.Clear();
     if (symbols != null)
     {
       foreach (Symbol symbol in symbols)
       {
         if (symbol.multiplier == null) continue;
+        double symbolMultiplier = 0;
         foreach (double m in symbol.multiplier)
-          if (m > maxPayoutMultiplier) maxPayoutMultiplier = m;
+          if (m > symbolMultiplier) symbolMultiplier = m;
+
+        symbolPayoutMultipliers[symbol.id] = symbolMultiplier;
+        if (symbolMultiplier > maxPayoutMultiplier) maxPayoutMultiplier = symbolMultiplier;
       }
     }
   }
@@ -660,6 +713,34 @@ public class UIManager : MonoBehaviour
   {
     UpdateBetDisplay(totalBet);
     if (PayoutText) PayoutText.text = (maxPayoutMultiplier * totalBet).ToString("F2");
+    UpdateSymbolPayoutTexts(totalBet);
+    UpdateWildComboPayoutTexts(totalBet);
+  }
+
+  private void UpdateSymbolPayoutTexts(double totalBet)
+  {
+    SetSymbolPayoutText(SingleBARPayoutText, 1, totalBet);
+    SetSymbolPayoutText(DoubleBARPayoutText, 2, totalBet);
+    SetSymbolPayoutText(TripleBARPayoutText, 3, totalBet);
+    SetSymbolPayoutText(BellPayoutText, 4, totalBet);
+    SetSymbolPayoutText(Red7PayoutText, 5, totalBet);
+    SetSymbolPayoutText(Wild2xPayoutText, 6, totalBet);
+    SetSymbolPayoutText(Wild3xPayoutText, 7, totalBet);
+    SetSymbolPayoutText(Wild5xPayoutText, 8, totalBet);
+    SetSymbolPayoutText(Wild10xPayoutText, 9, totalBet);
+  }
+
+  private void SetSymbolPayoutText(TMP_Text text, int symbolId, double totalBet)
+  {
+    if (text && symbolPayoutMultipliers.TryGetValue(symbolId, out double multiplier))
+      text.text = (multiplier * totalBet).ToString("F2");
+  }
+
+  private void UpdateWildComboPayoutTexts(double totalBet)
+  {
+    if (WildCombo3PayoutText) WildCombo3PayoutText.text = (WildCombo3Payout * totalBet).ToString("F2");
+    if (WildCombo5PayoutText) WildCombo5PayoutText.text = (WildCombo5Payout * totalBet).ToString("F2");
+    if (WildCombo10PayoutText) WildCombo10PayoutText.text = (WildCombo10Payout * totalBet).ToString("F2");
   }
 
   internal void ShowTicker()
@@ -700,10 +781,18 @@ public class UIManager : MonoBehaviour
     return null;
   }
 
-  internal IEnumerator ShowBonusWinSequence(double totalWin, double bet)
+  internal void PlayBonusWinSequence(double totalWin, double bet)
+  {
+    if (_bonusWinCoroutine != null) StopCoroutine(_bonusWinCoroutine);
+    _bonusWinCoroutine = StartCoroutine(BonusWinRoutine(totalWin, bet));
+  }
+
+  private IEnumerator BonusWinRoutine(double totalWin, double bet)
   {
     string tier = GetBonusWinTier(totalWin, bet);
     if (tier == null) yield break;
+
+    _bonusWinActive = true;
 
     yield return new WaitForSeconds(bonusWinShowDelay);
 
@@ -717,7 +806,7 @@ public class UIManager : MonoBehaviour
     float bonusWinDisplay = 0f;
     if (BonusWinAmountText)
       yield return DOTween.To(() => bonusWinDisplay, v => { bonusWinDisplay = v; BonusWinAmountText.text = v.ToString("F3"); },
-        (float)totalWin, bonusWinCountDuration).WaitForCompletion();
+        (float)totalWin, bonusWinCountDuration).SetTarget(BonusWinAmountText).WaitForCompletion();
     else
       yield return new WaitForSeconds(bonusWinCountDuration);
 
@@ -725,6 +814,8 @@ public class UIManager : MonoBehaviour
 
     if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.doLoopAnimation = false; }
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(false);
+    _bonusWinActive = false;
+    _bonusWinCoroutine = null;
   }
 
   private void UpdateBetDisplay(double bet)
@@ -736,10 +827,21 @@ public class UIManager : MonoBehaviour
   {
     if (SlideContainer && InfoSlides != null && InfoSlides.Length > 0)
       SlideContainer.sprite = InfoSlides[index];
+
+    if (SymbolPayoutOverlay) SymbolPayoutOverlay.SetActive(index == symbolPayoutSlideIndex);
+    if (WildComboPayoutOverlay) WildComboPayoutOverlay.SetActive(index == wildComboPayoutSlideIndex);
   }
 
-  internal IEnumerator ShowBigWinSequence(double totalWin)
+  internal void PlayBigWinSequence(double totalWin)
   {
+    if (_bigWinCoroutine != null) StopCoroutine(_bigWinCoroutine);
+    _bigWinCoroutine = StartCoroutine(BigWinRoutine(totalWin));
+  }
+
+  private IEnumerator BigWinRoutine(double totalWin)
+  {
+    _bigWinActive = true;
+
     yield return new WaitForSeconds(bigWinShowDelay);
 
     if (BigWinAmountText) { BigWinAmountText.text = "0.000"; BigWinAmountText.gameObject.SetActive(false); }
@@ -760,11 +862,14 @@ public class UIManager : MonoBehaviour
     }
     if (audioManager) audioManager.PlaySuperBonusWinner();
 
-    StartCoroutine(BigWinAmountRoutine(panelAnim, totalWin));
+    if (_bigWinAmountCoroutine != null) StopCoroutine(_bigWinAmountCoroutine);
+    _bigWinAmountCoroutine = StartCoroutine(BigWinAmountRoutine(panelAnim, totalWin));
 
     yield return new WaitForSeconds(bigWinCountDuration + bigWinHoldDuration);
 
     if (BigWinSequencePanel) BigWinSequencePanel.SetActive(false);
+    _bigWinActive = false;
+    _bigWinCoroutine = null;
   }
 
   private IEnumerator BigWinAmountRoutine(ImageAnimation panelAnim, double totalWin)
@@ -789,14 +894,38 @@ public class UIManager : MonoBehaviour
     BigWinAmountText.rectTransform.DOScale(finalTextScale, 0.6f).SetEase(Ease.OutBack);
 
     float bigWinDisplay = 0f;
-    Tween countTween = DOTween.To(() => bigWinDisplay, v => { bigWinDisplay = v; BigWinAmountText.text = v.ToString("F3"); },
-      (float)totalWin, bigWinCountDuration);
+    DOTween.To(() => bigWinDisplay, v => { bigWinDisplay = v; BigWinAmountText.text = v.ToString("F3"); },
+      (float)totalWin, bigWinCountDuration).SetTarget(BigWinAmountText);
 
     yield return new WaitForSeconds(Mathf.Max(0f, hideAt - showAt));
 
-    countTween.Kill();
+    DOTween.Kill(BigWinAmountText);
     BigWinAmountText.rectTransform.DOKill();
     BigWinAmountText.gameObject.SetActive(false);
+    _bigWinAmountCoroutine = null;
+  }
+
+  internal void SkipWinSequences()
+  {
+    if (_spinWinCoroutine != null) { StopCoroutine(_spinWinCoroutine); _spinWinCoroutine = null; }
+    if (_bonusWinCoroutine != null) { StopCoroutine(_bonusWinCoroutine); _bonusWinCoroutine = null; }
+    if (_bigWinCoroutine != null) { StopCoroutine(_bigWinCoroutine); _bigWinCoroutine = null; }
+    if (_bigWinAmountCoroutine != null) { StopCoroutine(_bigWinAmountCoroutine); _bigWinAmountCoroutine = null; }
+
+    if (SpinWinPanel) SpinWinPanel.transform.DOKill();
+    if (TotalWin_text) DOTween.Kill(TotalWin_text);
+    if (SpinWinText) DOTween.Kill(SpinWinText);
+    if (BonusWinAmountText) DOTween.Kill(BonusWinAmountText);
+    if (BigWinAmountText) { DOTween.Kill(BigWinAmountText); BigWinAmountText.rectTransform.DOKill(); }
+
+    HideSpinWin();
+    if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.doLoopAnimation = false; }
+    if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(false);
+    if (BigWinSequencePanel) BigWinSequencePanel.SetActive(false);
+
+    _spinWinActive = false;
+    _bonusWinActive = false;
+    _bigWinActive = false;
   }
 
   // TODO: Add scale animation for BonusWinAmountText — frames/timing TBD with team
