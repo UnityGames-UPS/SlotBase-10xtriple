@@ -389,10 +389,10 @@ private void OnError(Error err)
       slotManager.FetchLines(LineIds[i], i);
     }
     slotManager.SetInitialUI();
-    StartCoroutine(uiManager.PlayIntro());
 #if UNITY_WEBGL && !UNITY_EDITOR
     JSManager.SendCustomMessage("OnEnter");
 #endif
+    StartCoroutine(uiManager.PlayIntro());
     RaycastBlocker.SetActive(false);
   }
 

@@ -38,6 +38,21 @@ public class UIManager : MonoBehaviour
 
   [Header("Intro")]
   [SerializeField] private RectTransform GameContent;
+  [Header("Intro Content Pop")]
+  [SerializeField] private float contentPopStartScale = 0.6f;
+  [SerializeField] private float contentPopScale1 = 1.05f;
+  [SerializeField] private float contentPopScale2 = 0.95f;
+  [SerializeField] private float contentPopScale3 = 1.025f;
+  [SerializeField] private float contentPopScale4 = 0.975f;
+  [SerializeField] private float contentPopScale5 = 1.0125f;
+  [SerializeField] private float contentPopDuration1 = 0.55f;
+  [SerializeField] private float contentPopDuration2 = 0.4f;
+  [SerializeField] private float contentPopDuration3 = 0.3f;
+  [SerializeField] private float contentPopDuration4 = 0.25f;
+  [SerializeField] private float contentPopDuration5 = 0.2f;
+  [SerializeField] private float contentPopSettleDuration = 0.6f;
+  [Tooltip("Elasticity of the final springy settle. Higher = more bounce.")]
+  [SerializeField] private float contentPopSettleElasticity = 1f;
   private int _anticipationPunchStep = 0;
   private readonly float[] _anticipationPunchScales = { 1.05f, 1.10f };
   private const float _anticipationZoomTarget = 1.20f;
@@ -367,13 +382,7 @@ public class UIManager : MonoBehaviour
 
     if (GameContent)
     {
-      Vector3 fullScale = GameContent.localScale;
-      GameContent.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-      yield return DOTween.Sequence()
-        .Append(GameContent.DOScale(fullScale, 0.6f).SetEase(Ease.OutCubic))
-        .Append(GameContent.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.4f).SetEase(Ease.InOutCubic))
-        .Append(GameContent.DOScale(fullScale, 0.5f).SetEase(Ease.OutBack, 2.5f))
-        .WaitForCompletion();
+      yield return PlayContentPop().WaitForCompletion();
     }
 
     if (freeSpinReelCanvasGroup)
@@ -383,6 +392,34 @@ public class UIManager : MonoBehaviour
     }
 
     if (slotManager) slotManager.ToggleButtonGrp(true);
+  }
+
+  private Tween contentPopTween;
+  private Vector3 contentFullScale;
+  private bool contentFullScaleCaptured;
+
+  private Sequence PlayContentPop()
+  {
+    // Capture the resting scale once so re-triggering mid-tween doesn't compound.
+    if (!contentFullScaleCaptured)
+    {
+      contentFullScale = GameContent.localScale;
+      contentFullScaleCaptured = true;
+    }
+
+    contentPopTween?.Kill();
+    GameContent.localScale = contentFullScale * contentPopStartScale;
+
+    Sequence seq = DOTween.Sequence()
+      .Append(GameContent.DOScale(contentFullScale * contentPopScale1, contentPopDuration1).SetEase(Ease.InOutCubic))
+      .Append(GameContent.DOScale(contentFullScale * contentPopScale2, contentPopDuration2).SetEase(Ease.InOutCubic))
+      .Append(GameContent.DOScale(contentFullScale * contentPopScale3, contentPopDuration3).SetEase(Ease.InOutSine))
+      .Append(GameContent.DOScale(contentFullScale * contentPopScale4, contentPopDuration4).SetEase(Ease.InOutSine))
+      .Append(GameContent.DOScale(contentFullScale * contentPopScale5, contentPopDuration5).SetEase(Ease.InOutSine))
+      .Append(GameContent.DOScale(contentFullScale, contentPopSettleDuration).SetEase(Ease.OutBack, contentPopSettleElasticity));
+
+    contentPopTween = seq;
+    return seq;
   }
 
   internal void LowBalPopup()
