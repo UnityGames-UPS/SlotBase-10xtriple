@@ -872,7 +872,6 @@ GameObject:
   - component: {fileID: 65837300}
   - component: {fileID: 65837302}
   - component: {fileID: 65837303}
-  - component: {fileID: 65837301}
   m_Layer: 5
   m_Name: SlotMain
   m_TagString: Untagged
@@ -904,36 +903,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -27.700012}
   m_SizeDelta: {x: 929.9, y: 533.1}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &65837301
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 65837299}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &65837302
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -951,10 +920,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 65837299}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 31a19414c41e5ae4aae2af33fee712f6, type: 3}
+  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Mask
-  m_ShowMaskGraphic: 0
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.RectMask2D
+  m_Padding: {x: 0, y: 0, z: 0, w: 0}
+  m_Softness: {x: 0, y: 0}
 --- !u!1 &65884113
 GameObject:
   m_ObjectHideFlags: 0
@@ -2553,7 +2523,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 65837300}
-  - {fileID: 477308014}
   m_Father: {fileID: 1298497625}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -5647,7 +5616,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 477308013}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -5657,7 +5626,7 @@ RectTransform:
   - {fileID: 2014611770}
   - {fileID: 1382519504}
   - {fileID: 1911952198}
-  m_Father: {fileID: 163614924}
+  m_Father: {fileID: 1298497625}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -10328,7 +10297,7 @@ PrefabInstance:
       objectReference: {fileID: 1728521618}
     - target: {fileID: 7610637853776029503, guid: fbbc9264dc50de44589243147c5ea3dc, type: 3}
       propertyPath: testToken
-      value: a9ca0a1652654cbfb38755e63936ea62
+      value: ebcdb4b365bd45c984ac88ed5a8e9bf4
       objectReference: {fileID: 0}
     - target: {fileID: 7610637853776029503, guid: fbbc9264dc50de44589243147c5ea3dc, type: 3}
       propertyPath: uiManager
@@ -15003,6 +14972,7 @@ RectTransform:
   - {fileID: 1017615300}
   - {fileID: 1702394099}
   - {fileID: 1509285911}
+  - {fileID: 477308014}
   m_Father: {fileID: 594183475}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -16075,7 +16045,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1407363538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17311,7 +17281,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 6.6, y: -29.5}
+  m_AnchoredPosition: {x: 3.48, y: -29.5}
   m_SizeDelta: {x: 294.5, y: 549.1}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1509285912
@@ -23933,7 +23903,16 @@ MonoBehaviour:
   MiddleReelGlow: {fileID: 1509285910}
   LastReelGlow: {fileID: 1702394098}
   FreeSpinSlotMachine: {fileID: 2112438212}
+  SpecialReelSlotImages:
+    slotImages:
+    - {fileID: 123196986}
+    - {fileID: 1259399545}
+    - {fileID: 1666902360}
+    - {fileID: 899343982}
+    - {fileID: 2021207588}
+  specialReelSwapDelay: 1
   paylineHoldDuration: 1.5
+  paylineAllTogetherDuration: 1.5
   TempList: []
   SocketManager: {fileID: 839819183}
   IconSizeFactor: 130
@@ -23947,7 +23926,7 @@ Transform:
   m_GameObject: {fileID: 2073624786}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 522.6492, y: 251.43428, z: 0}
+  m_LocalPosition: {x: 445.62, y: 251.43428, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

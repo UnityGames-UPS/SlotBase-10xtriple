@@ -832,6 +832,12 @@ public class UIManager : MonoBehaviour
 
     _bonusWinActive = true;
 
+    if (GameContent)
+    {
+      GameContent.DOKill();
+      GameContent.DOScale(Vector3.one * 0.7f, 0.5f).SetDelay(2f);
+    }
+
     yield return new WaitForSeconds(bonusWinShowDelay);
 
     if (BonusNameGraphicImage) BonusNameGraphicImage.sprite = GetBonusWinTierSprite(tier);
@@ -848,7 +854,14 @@ public class UIManager : MonoBehaviour
     else
       yield return new WaitForSeconds(bonusWinCountDuration);
 
-    yield return new WaitForSeconds(bonusWinHoldDuration);
+    yield return new WaitForSeconds(Mathf.Max(0f, bonusWinHoldDuration - 0.5f));
+
+    if (GameContent)
+    {
+      GameContent.DOKill();
+      GameContent.DOScale(Vector3.one, 0.5f);
+    }
+    yield return new WaitForSeconds(0.5f);
 
     if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.doLoopAnimation = false; }
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(false);
@@ -960,6 +973,7 @@ public class UIManager : MonoBehaviour
     if (BonusWinCoinFallingAnim) { BonusWinCoinFallingAnim.StopAnimation(); BonusWinCoinFallingAnim.doLoopAnimation = false; }
     if (BonusWinSequencePanel) BonusWinSequencePanel.SetActive(false);
     if (BigWinSequencePanel) BigWinSequencePanel.SetActive(false);
+    if (GameContent) { GameContent.DOKill(); GameContent.localScale = Vector3.one; }
 
     _spinWinActive = false;
     _bonusWinActive = false;

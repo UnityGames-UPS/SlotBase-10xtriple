@@ -113,6 +113,8 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private GameObject MiddleReelGlow;
   [SerializeField] private GameObject LastReelGlow;
   [SerializeField] internal GameObject FreeSpinSlotMachine;
+  [SerializeField] private SlotImage SpecialReelSlotImages;
+  [SerializeField] private float specialReelSwapDelay = 1f;
 
   int tweenHeight = 0;
   private float topSlotImageY = 3393.2f;
@@ -129,6 +131,7 @@ public class SlotBehaviour : MonoBehaviour
   private Image[] _specialReelImages;
   private float[] _specialReelImageInitialLocalY;
   [SerializeField] private float paylineHoldDuration = 1.5f;
+  [SerializeField] private float paylineAllTogetherDuration = 1.5f;
 
   [SerializeField]
   private List<ImageAnimation> TempList;  //stores the sprites whose animation is running at present 
@@ -275,6 +278,11 @@ public class SlotBehaviour : MonoBehaviour
         if (freeSpinReelAnim) freeSpinReelAnim.StartAnimation();
       }
       ToggleButtonGrp(false);
+      if (Spin_Button)
+      {
+        Spin_Button.interactable = false;
+        Spin_Button.GetComponent<Image>().sprite = SpinDeactivatedSprite;
+      }
 
       if (FreeSpinRoutine != null)
       {
@@ -304,15 +312,18 @@ public class SlotBehaviour : MonoBehaviour
       uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
       isFirstFreeSpin = false;
     } while (isFreeSpinActive);
-    if (SpecialReelObject) SpecialReelObject.SetActive(false);
-    if (MiddleReelObject) MiddleReelObject.SetActive(true);
-    if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
     if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(false);
     uiManager.EndFreeSpinTriggerSequence();
 
     double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
     uiManager.PlayBonusWinSequence(totalFreeSpinWin, currentTotalBet);
     uiManager.PlaySpinWin(totalFreeSpinWin);
+
+    yield return new WaitForSeconds(specialReelSwapDelay);
+    if (SpecialReelObject) SpecialReelObject.SetActive(false);
+    if (MiddleReelObject) MiddleReelObject.SetActive(true);
+    if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
+
     if (totalFreeSpinWin > 0)
       yield return WaitForFreeSpinWinDisplay();
 
@@ -637,24 +648,18 @@ public class SlotBehaviour : MonoBehaviour
 
     IsSpinning = true;
 
-    ToggleButtonGrp(false);
-    if (Spin_Button)
-    {
-      Spin_Button.GetComponent<Image>().sprite = StopSprite;
-      var ss = Spin_Button.spriteState;
-      ss.pressedSprite = StopPressedSprite;
-      Spin_Button.spriteState = ss;
-    }
     if (IsFreeSpin && _isFirstFreeSpin)
     {
       InitializeSpecialReelTweening();
       yield return new WaitForSeconds(2f);
+      ActivateStopButton();
       if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
         InitializeTweening(Slot_Transform[i], i);
     }
     else if (IsFreeSpin)
     {
+      ActivateStopButton();
       InitializeSpecialReelTweening();
       if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
@@ -662,6 +667,7 @@ public class SlotBehaviour : MonoBehaviour
     }
     else
     {
+      ActivateStopButton();
       for (int i = 0; i < numberOfSlots; i++)
       {
         InitializeTweening(Slot_Transform[i], i);
@@ -682,6 +688,10 @@ public class SlotBehaviour : MonoBehaviour
     {
       for (int j = 0; j < numberOfSlots; j++)
       {
+        // Column 1 is hidden behind the special wilds reel during free spins — leave it showing
+        // whatever it last had before free spins started rather than a stale free-spin wild.
+        if (IsFreeSpin && j == 1) continue;
+
         int resultNum = int.Parse(SocketManager.ResultData.matrix[i][j]);
         // print("resultNum: " + resultNum);
         // print("image loc: " + j + " " + i);
@@ -692,6 +702,20 @@ public class SlotBehaviour : MonoBehaviour
         }
         TempImages[j].slotImages[i].sprite = myImages[resultNum];
         TempImages[j].slotImages[i].rectTransform.sizeDelta = ScatterSymbolBaseSize;
+      }
+    }
+
+    if (IsFreeSpin && SpecialReelSlotImages != null)
+    {
+      for (int row = 0; row < numberOfRows && row < SpecialReelSlotImages.slotImages.Count; row++)
+      {
+        int resultNum = int.Parse(SocketManager.ResultData.matrix[row][1]);
+        ImageAnimation specialAnimScript = SpecialReelSlotImages.slotImages[row].GetComponent<ImageAnimation>();
+        if (specialAnimScript != null)
+        {
+          PopulateAnimationSprites(specialAnimScript, resultNum);
+        }
+        SpecialReelSlotImages.slotImages[row].sprite = myImages[resultNum];
       }
     }
 
@@ -889,7 +913,7 @@ public class SlotBehaviour : MonoBehaviour
     CheckWinPopups();
 
     yield return new WaitUntil(() => !CheckPopups);
-    if (!IsAutoSpin && !IsFreeSpin)
+    if (!IsAutoSpin && !IsFreeSpin && !willTriggerFreeSpin)
     {
       ToggleButtonGrp(true);
       IsSpinning = false;
@@ -993,21 +1017,60 @@ public class SlotBehaviour : MonoBehaviour
     CheckPopups = false;
   }
 
-  private IEnumerator CyclePaylines(List<int> lineIds)
+  // Column 1 is visually replaced by the special wilds reel during free spins, so its symbol animations
+  // must target the special reel's own images rather than the hidden middle reel's.
+  private GameObject GetSlotImageGameObject(int row, int column)
   {
+    if (IsFreeSpin && column == 1 && SpecialReelSlotImages != null && row < SpecialReelSlotImages.slotImages.Count)
+      return SpecialReelSlotImages.slotImages[row].gameObject;
+    return TempImages[column].slotImages[row].gameObject;
+  }
+
+  private IEnumerator CyclePaylines(List<int> lineIds, Dictionary<int, List<KeyValuePair<int, int>>> lineCoords)
+  {
+    // Phase 1: show every winning line together, all symbol animations playing at once.
+    List<ImageAnimation> allAnims = new();
+    foreach (int id in lineIds)
+    {
+      if (PaylineGraphics.Count > id)
+      {
+        PaylineGraphics[id].SetActive(true);
+        StartGameAnimation(PaylineGraphics[id]);
+      }
+      foreach (var coord in lineCoords[id])
+      {
+        GameObject symbolObj = GetSlotImageGameObject(coord.Key, coord.Value);
+        ImageAnimation anim = symbolObj.GetComponent<ImageAnimation>();
+        StartGameAnimation(symbolObj);
+        if (anim != null) allAnims.Add(anim);
+      }
+    }
+    yield return new WaitForSeconds(paylineAllTogetherDuration);
+    foreach (int id in lineIds)
+      if (PaylineGraphics.Count > id) PaylineGraphics[id].SetActive(false);
+    foreach (var anim in allAnims) anim.StopAnimation();
+
+    // Phase 2: one winning line at a time, looping — only that line's symbols animate.
     while (true)
     {
-      for (int i = 0; i < lineIds.Count; i++)
+      foreach (int id in lineIds)
       {
-        int id = lineIds[i];
+        List<ImageAnimation> lineAnims = new();
         if (PaylineGraphics.Count > id)
         {
           PaylineGraphics[id].SetActive(true);
           StartGameAnimation(PaylineGraphics[id]);
         }
+        foreach (var coord in lineCoords[id])
+        {
+          GameObject symbolObj = GetSlotImageGameObject(coord.Key, coord.Value);
+          ImageAnimation anim = symbolObj.GetComponent<ImageAnimation>();
+          StartGameAnimation(symbolObj);
+          if (anim != null) lineAnims.Add(anim);
+        }
         yield return new WaitForSeconds(paylineHoldDuration);
-        if (PaylineGraphics.Count > id)
-          PaylineGraphics[id].SetActive(false);
+        if (PaylineGraphics.Count > id) PaylineGraphics[id].SetActive(false);
+        foreach (var anim in lineAnims) anim.StopAnimation();
       }
     }
   }
@@ -1019,7 +1082,6 @@ public class SlotBehaviour : MonoBehaviour
     {
       List<int> sortedIds = new List<int>(LineId);
       sortedIds.Sort();
-      _paylineCycleCoroutine = StartCoroutine(CyclePaylines(sortedIds));
 
       if (jackpot > 0)
       {
@@ -1027,29 +1089,25 @@ public class SlotBehaviour : MonoBehaviour
         {
           for (int k = 0; k < TempImages[i].slotImages.Count; k++)
           {
-            StartGameAnimation(TempImages[i].slotImages[k].gameObject);
+            StartGameAnimation(GetSlotImageGameObject(k, i));
           }
         }
       }
       else
       {
-        List<KeyValuePair<int, int>> coords = new();
+        Dictionary<int, List<KeyValuePair<int, int>>> lineCoords = new();
         for (int j = 0; j < LineId.Count; j++)
         {
+          List<KeyValuePair<int, int>> coords = new();
           for (int k = 0; k < SocketManager.ResultData.payload.wins[j].positions.Count; k++)
           {
             int rowIndex = SocketManager.InitialData.lines[LineId[j]][k];
             int columnIndex = k;
             coords.Add(new KeyValuePair<int, int>(rowIndex, columnIndex));
           }
+          lineCoords[LineId[j]] = coords;
         }
-
-        foreach (var coord in coords)
-        {
-          int rowIndex = coord.Key;
-          int columnIndex = coord.Value;
-          StartGameAnimation(TempImages[columnIndex].slotImages[rowIndex].gameObject);
-        }
+        _paylineCycleCoroutine = StartCoroutine(CyclePaylines(sortedIds, lineCoords));
       }
     }
   }
@@ -1080,6 +1138,18 @@ public class SlotBehaviour : MonoBehaviour
     if (MaxBet_Button) MaxBet_Button.interactable = active;
     if (TBetMinus_Button) TBetMinus_Button.interactable = active;
     if (TBetPlus_Button) TBetPlus_Button.interactable = active;
+  }
+
+  private void ActivateStopButton()
+  {
+    ToggleButtonGrp(false);
+    if (Spin_Button)
+    {
+      Spin_Button.GetComponent<Image>().sprite = StopSprite;
+      var ss = Spin_Button.spriteState;
+      ss.pressedSprite = StopPressedSprite;
+      Spin_Button.spriteState = ss;
+    }
   }
 
   //start the icons animation
