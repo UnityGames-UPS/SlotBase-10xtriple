@@ -125,6 +125,7 @@ public class SlotBehaviour : MonoBehaviour
   private Coroutine _paylineCycleCoroutine;
   private Tweener _specialReelSpinTween;
   private Coroutine _specialReelRecycleCoroutine;
+  private Coroutine _specialReelDebugWatcher;
   private Image[] _specialReelImages;
   private float[] _specialReelImageInitialLocalY;
   [SerializeField] private float paylineHoldDuration = 1.5f;
@@ -792,10 +793,10 @@ public class SlotBehaviour : MonoBehaviour
       Spin_Button.interactable = false;
     }
 
-    for (int dbgI = 0; dbgI < numberOfSlots; dbgI++)
-    {
-      Debug.Log($"[ReelLanding DEBUG] pre-KillAllTweens reel {dbgI}: Y={Slot_Transform[dbgI].localPosition.y:F2} tweenActive={alltweens[dbgI].IsActive()} tweenPlaying={(alltweens[dbgI].IsActive() && alltweens[dbgI].IsPlaying())} time={Time.time:F3}");
-    }
+    // for (int dbgI = 0; dbgI < numberOfSlots; dbgI++)
+    // {
+    //   Debug.Log($"[ReelLanding DEBUG] pre-KillAllTweens reel {dbgI}: Y={Slot_Transform[dbgI].localPosition.y:F2} tweenActive={alltweens[dbgI].IsActive()} tweenPlaying={(alltweens[dbgI].IsActive() && alltweens[dbgI].IsPlaying())} time={Time.time:F3}");
+    // }
     KillAllTweens();
     if (audioController) audioController.StopSpinLoop();
 
@@ -1209,6 +1210,27 @@ public class SlotBehaviour : MonoBehaviour
       .SetLoops(-1, LoopType.Incremental)
       .SetEase(Ease.Linear);
     _specialReelSpinTween.Play();
+
+    if (_specialReelDebugWatcher != null) StopCoroutine(_specialReelDebugWatcher);
+    _specialReelDebugWatcher = StartCoroutine(SpecialReelDebugWatcher());
+  }
+
+  private IEnumerator SpecialReelDebugWatcher()
+  {
+    while (true)
+    {
+      if (_specialReelImages != null && SpecialReelTransform)
+      {
+        float parentY = SpecialReelTransform.localPosition.y;
+        var positions = new System.Text.StringBuilder();
+        foreach (var img in _specialReelImages)
+          positions.Append((parentY + img.transform.localPosition.y).ToString("F0")).Append(",");
+        bool tweenActive = _specialReelSpinTween != null && _specialReelSpinTween.IsActive();
+        bool tweenPlaying = tweenActive && _specialReelSpinTween.IsPlaying();
+        Debug.Log($"[SpecialReel DEBUG] time={Time.time:F2} parentY={parentY:F1} tweenActive={tweenActive} tweenPlaying={tweenPlaying} positions={positions}");
+      }
+      yield return new WaitForSeconds(1f);
+    }
   }
 
   private void StopSpecialReelTweening()
@@ -1221,6 +1243,11 @@ public class SlotBehaviour : MonoBehaviour
     {
       StopCoroutine(_specialReelRecycleCoroutine);
       _specialReelRecycleCoroutine = null;
+    }
+    if (_specialReelDebugWatcher != null)
+    {
+      StopCoroutine(_specialReelDebugWatcher);
+      _specialReelDebugWatcher = null;
     }
     if (_specialReelImages != null)
     {
@@ -1256,9 +1283,9 @@ public class SlotBehaviour : MonoBehaviour
     }
 
     slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, topSlotImageY - reelLandingDropOffset);
-    Debug.Log($"[ReelLanding DEBUG] reel {index} snap: isStop={isStop} dropOffset={reelLandingDropOffset:F2} snapY={slotTransform.localPosition.y:F2} time={Time.time:F3}");
-    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad)
-      .OnComplete(() => Debug.Log($"[ReelLanding DEBUG] reel {index} rise COMPLETE finalY={slotTransform.localPosition.y:F2} time={Time.time:F3}"));
+    // Debug.Log($"[ReelLanding DEBUG] reel {index} snap: isStop={isStop} dropOffset={reelLandingDropOffset:F2} snapY={slotTransform.localPosition.y:F2} time={Time.time:F3}");
+    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad);
+    // .OnComplete(() => Debug.Log($"[ReelLanding DEBUG] reel {index} rise COMPLETE finalY={slotTransform.localPosition.y:F2} time={Time.time:F3}"));
     if (!isStop)
     {
       yield return new WaitForSeconds(0.2f);
@@ -1267,7 +1294,7 @@ public class SlotBehaviour : MonoBehaviour
     {
       yield return null;
     }
-    Debug.Log($"[ReelLanding DEBUG] reel {index} StopTweening returning: currentY={slotTransform.localPosition.y:F2} tweenActive={alltweens[index].IsActive()} tweenPlaying={(alltweens[index].IsActive() && alltweens[index].IsPlaying())} time={Time.time:F3}");
+    // Debug.Log($"[ReelLanding DEBUG] reel {index} StopTweening returning: currentY={slotTransform.localPosition.y:F2} tweenActive={alltweens[index].IsActive()} tweenPlaying={(alltweens[index].IsActive() && alltweens[index].IsPlaying())} time={Time.time:F3}");
   }
 
 

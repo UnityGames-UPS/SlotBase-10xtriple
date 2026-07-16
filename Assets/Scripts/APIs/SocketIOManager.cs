@@ -304,7 +304,7 @@ private void OnError(Error err)
       if (json != null)
       {
         gameSocket.Emit(eventName, json);
-        Debug.Log("JSON data sent: " + json);
+        // Debug.Log("JSON data sent: " + json);
       }
       else
       {
