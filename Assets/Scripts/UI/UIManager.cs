@@ -835,7 +835,7 @@ public class UIManager : MonoBehaviour
     if (GameContent)
     {
       GameContent.DOKill();
-      GameContent.DOScale(Vector3.one * 0.7f, 0.5f).SetDelay(2f);
+      GameContent.DOScale(Vector3.one * 0.7f, 0.5f).SetDelay(1.7f);
     }
 
     yield return new WaitForSeconds(bonusWinShowDelay);

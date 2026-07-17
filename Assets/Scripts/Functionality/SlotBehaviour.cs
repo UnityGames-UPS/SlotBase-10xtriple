@@ -112,7 +112,7 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private GameObject LastReelGlow;
   [SerializeField] internal GameObject FreeSpinSlotMachine;
   [SerializeField] private SlotImage SpecialReelSlotImages;
-  [SerializeField] private float specialReelSwapDelay = 1f;
+  private float specialReelSwapDelay = 2.3f;
 
   [Header("Reel Motion")]
   // Reel travel speed in local units/second. Durations are derived from this so every move
@@ -314,8 +314,6 @@ public class SlotBehaviour : MonoBehaviour
       uiManager.UpdateFreeSpinsRemaining(SocketManager.ResultData.payload.freeSpinsRemaining);
       isFirstFreeSpin = false;
     } while (isFreeSpinActive);
-    if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(false);
-    uiManager.EndFreeSpinTriggerSequence();
 
     double totalFreeSpinWin = SocketManager.ResultData.payload.totalFreeSpinWin;
     uiManager.PlayBonusWinSequence(totalFreeSpinWin, currentTotalBet);
@@ -325,6 +323,8 @@ public class SlotBehaviour : MonoBehaviour
     if (SpecialReelObject) SpecialReelObject.SetActive(false);
     if (MiddleReelObject) MiddleReelObject.SetActive(true);
     if (MiddleReelGlow) MiddleReelGlow.SetActive(false);
+    if (FreeSpinSlotMachine) FreeSpinSlotMachine.SetActive(false);
+    uiManager.EndFreeSpinTriggerSequence();
 
     if (totalFreeSpinWin > 0)
       yield return WaitForFreeSpinWinDisplay();
