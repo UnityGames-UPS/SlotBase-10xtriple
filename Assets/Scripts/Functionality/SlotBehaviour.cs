@@ -108,28 +108,35 @@ public class SlotBehaviour : MonoBehaviour
   [SerializeField] private GameObject SpecialReelObject;
   [SerializeField] private Transform SpecialReelTransform;
   [SerializeField] private GameObject MiddleReelObject;
-  [SerializeField] private float specialReelSpeedMultiplier = 0.6f;
-  [SerializeField] private float specialReelDuration = 2f;
   [SerializeField] private GameObject MiddleReelGlow;
   [SerializeField] private GameObject LastReelGlow;
   [SerializeField] internal GameObject FreeSpinSlotMachine;
   [SerializeField] private SlotImage SpecialReelSlotImages;
   [SerializeField] private float specialReelSwapDelay = 1f;
 
-  int tweenHeight = 0;
-  private float topSlotImageY = 3393.2f;
+  [Header("Reel Motion")]
+  // Reel travel speed in local units/second. Durations are derived from this so every move
+  // (intro, loop, landing) runs at a constant speed regardless of distance.
+  [SerializeField] private float reelSpeed = 8350f;
+  [SerializeField] private float specialReelSpeed = 1670f;
 
+  // The looping spin sweeps TopY -> BottomY and snaps back. TopY - BottomY must be an exact
+  // multiple of the spin band's icon pitch or the snap is visible.
+  [SerializeField] private float ReelTopY;
+  [SerializeField] private float ReelBottomY;
+  [SerializeField] private float ReelRestY = 3393.2f;
 
-  private List<Tweener> alltweens = new List<Tweener>();
-  private Image[][] reelImages = new Image[3][];
-  private float[][] reelImageInitialLocalY = new float[3][];
-  private Coroutine[] recycleCoroutines = new Coroutine[3];
+  [SerializeField] private float SpecialReelTopY;
+  [SerializeField] private float SpecialReelBottomY;
+  [SerializeField] private float SpecialReelRestY = 3393.2f;
+
+  [SerializeField] private Ease landEase = Ease.OutBack;
+  [SerializeField] private float landOvershoot = 0.9f;
+
+  // Base columns occupy 0..numberOfSlots-1; the free-spin special column gets its own slot.
+  private const int SpecialReelIndex = 3;
+  private readonly Tween[] reelTweens = new Tween[4];
   private Coroutine _paylineCycleCoroutine;
-  private Tweener _specialReelSpinTween;
-  private Coroutine _specialReelRecycleCoroutine;
-  private Coroutine _specialReelDebugWatcher;
-  private Image[] _specialReelImages;
-  private float[] _specialReelImageInitialLocalY;
   [SerializeField] private float paylineHoldDuration = 1.5f;
   [SerializeField] private float paylineAllTogetherDuration = 1.5f;
 
@@ -152,14 +159,11 @@ public class SlotBehaviour : MonoBehaviour
   private double currentBalance = 0;
   private double currentTotalBet = 0;
   protected int Lines = 5;
-  [SerializeField]
-  private int IconSizeFactor = 100;       //set this parameter according to the size of the icon and spacing
   private int numberOfSlots = 3;          //number of columns
   private int numberOfRows = 5;           //number of rows per column (3 real + 2 decorative edge rows)
   private bool StopSpinToggle;
   private float SpinDelay = 0.2f;
   [SerializeField] private float autoSpinExtraDelay = 0.0f;
-  private const float reelLandingDropOffset = 15f;
   private float minSpinDuration = 1.5f;
   internal bool WasAutoSpinOn;
   private bool _isFirstFreeSpin;
@@ -203,8 +207,6 @@ public class SlotBehaviour : MonoBehaviour
 
     if (AutoSpin_Button) AutoSpin_Button.onClick.RemoveAllListeners();
     if (AutoSpin_Button) AutoSpin_Button.onClick.AddListener(AutoSpin);
-
-    tweenHeight = (15 * IconSizeFactor) - 280;
   }
 
 
@@ -650,27 +652,27 @@ public class SlotBehaviour : MonoBehaviour
 
     if (IsFreeSpin && _isFirstFreeSpin)
     {
-      InitializeSpecialReelTweening();
+      InitializeReelSpin(SpecialReelTransform, SpecialReelIndex, SpecialReelTopY, SpecialReelBottomY, specialReelSpeed);
       yield return new WaitForSeconds(2f);
       ActivateStopButton();
       if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
-        InitializeTweening(Slot_Transform[i], i);
+        InitializeReelSpin(Slot_Transform[i], i, ReelTopY, ReelBottomY, reelSpeed);
     }
     else if (IsFreeSpin)
     {
       ActivateStopButton();
-      InitializeSpecialReelTweening();
+      InitializeReelSpin(SpecialReelTransform, SpecialReelIndex, SpecialReelTopY, SpecialReelBottomY, specialReelSpeed);
       if (audioController) audioController.PlaySpecialReelSpin();
       for (int i = 0; i < numberOfSlots; i++)
-        InitializeTweening(Slot_Transform[i], i);
+        InitializeReelSpin(Slot_Transform[i], i, ReelTopY, ReelBottomY, reelSpeed);
     }
     else
     {
       ActivateStopButton();
       for (int i = 0; i < numberOfSlots; i++)
       {
-        InitializeTweening(Slot_Transform[i], i);
+        InitializeReelSpin(Slot_Transform[i], i, ReelTopY, ReelBottomY, reelSpeed);
         yield return new WaitForSeconds(0.1f);
       }
     }
@@ -768,7 +770,10 @@ public class SlotBehaviour : MonoBehaviour
     for (int i = 0; i < numberOfSlots; i++)
     {
       if (IsFreeSpin && i == 1)
-        StopSpecialReelTweening();
+      {
+        if (audioController) audioController.StopSpecialReelSpin();
+        StopReelSpin(SpecialReelTransform, SpecialReelIndex, SpecialReelTopY, SpecialReelRestY, specialReelSpeed);
+      }
 
       if (i == specialScatterReelIndex)
       {
@@ -778,14 +783,14 @@ public class SlotBehaviour : MonoBehaviour
         uiManager.StartAnticipationZoom(anticipationExtraSpinDuration);
         yield return new WaitForSeconds(anticipationExtraSpinDuration);
         Debug.Log("[ScatterAnticipation DEBUG] Anticipation wait complete, stopping reel " + i);
-        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
-        Debug.Log("[ScatterAnticipation DEBUG] StopTweening complete, setting glow OFF");
+        yield return StopBaseReel(i);
+        Debug.Log("[ScatterAnticipation DEBUG] Reel stop complete, setting glow OFF");
         if (anticipationGlow) anticipationGlow.SetActive(false);
         Debug.Log("[ScatterAnticipation DEBUG] Glow set OFF successfully");
       }
       else
       {
-        yield return StopTweening(5, Slot_Transform[i], i, StopSpinToggle);
+        yield return StopBaseReel(i);
         if (!IsFreeSpin && (specialScatterReelIndex == -1 || i < specialScatterReelIndex))
         {
           int reelScatterCount = 0;
@@ -809,7 +814,12 @@ public class SlotBehaviour : MonoBehaviour
       uiManager.ResetAnticipationZoom();
     }
     StopSpinToggle = false;
-    yield return alltweens[^1].WaitForCompletion();
+    // Base columns share a speed and start landing in order, so the last one finishes last.
+    yield return reelTweens[numberOfSlots - 1].WaitForCompletion();
+    // The special column runs at its own slower speed, so it is still in flight here. It has to
+    // finish before KillAllTweens, or it freezes short of its rest position.
+    if (IsFreeSpin && reelTweens[SpecialReelIndex] != null && reelTweens[SpecialReelIndex].IsActive())
+      yield return reelTweens[SpecialReelIndex].WaitForCompletion();
 
     if (Spin_Button)
     {
@@ -817,10 +827,6 @@ public class SlotBehaviour : MonoBehaviour
       Spin_Button.interactable = false;
     }
 
-    // for (int dbgI = 0; dbgI < numberOfSlots; dbgI++)
-    // {
-    //   Debug.Log($"[ReelLanding DEBUG] pre-KillAllTweens reel {dbgI}: Y={Slot_Transform[dbgI].localPosition.y:F2} tweenActive={alltweens[dbgI].IsActive()} tweenPlaying={(alltweens[dbgI].IsActive() && alltweens[dbgI].IsPlaying())} time={Time.time:F3}");
-    // }
     KillAllTweens();
     if (audioController) audioController.StopSpinLoop();
 
@@ -856,11 +862,11 @@ public class SlotBehaviour : MonoBehaviour
 
     if (!IsFreeSpin && SocketManager.ResultData.payload.winAmount > 0)
     {
-      SpinDelay = 1.2f;
+      SpinDelay = 3f;
     }
     else
     {
-      SpinDelay = 0.2f;
+      SpinDelay = 2f;
     }
 
     if (SocketManager.ResultData.payload.winAmount > 0)
@@ -1175,66 +1181,50 @@ public class SlotBehaviour : MonoBehaviour
 
 
   #region TweeningCode
-  private void InitializeTweening(Transform slotTransform, int colIndex)
+  // Time needed to travel between two Y positions at the given speed.
+  private float DurationFor(float fromY, float toY, float speed)
+    => Mathf.Abs(toY - fromY) / Mathf.Max(speed, 0.0001f);
+
+  // Sweeps the reel down to bottomY at a constant speed, then loops topY -> bottomY forever.
+  // The reel's icons are never touched, so no state accumulates across spins.
+  private void InitializeReelSpin(Transform slotTransform, int index, float topY, float bottomY, float speed)
   {
-    // Exclude any Image on slotTransform itself (e.g. Mask component image)
-    List<Image> imageList = new List<Image>();
-    foreach (Image img in slotTransform.GetComponentsInChildren<Image>())
-      if (img.transform != slotTransform) imageList.Add(img);
-    Image[] images = imageList.ToArray();
-    System.Array.Sort(images, (a, b) => b.transform.localPosition.y.CompareTo(a.transform.localPosition.y));
+    if (!slotTransform) return;
+    reelTweens[index]?.Kill();
 
-    reelImages[colIndex] = images;
-    reelImageInitialLocalY[colIndex] = new float[images.Length];
-    for (int i = 0; i < images.Length; i++)
-      reelImageInitialLocalY[colIndex][i] = images[i].transform.localPosition.y;
-
-    float imageSpacing = images.Length > 1
-      ? Mathf.Abs(images[0].transform.localPosition.y - images[1].transform.localPosition.y)
-      : (float)IconSizeFactor;
-
-    // Threshold entirely in local-space units: slotTransform.localY + image.localY < this value
-    // means the image has scrolled below the visible window bottom
-    float visibleBottomLocalY = float.MaxValue;
-    for (int r = 0; r < numberOfRows && r < TempImages[colIndex].slotImages.Count; r++)
-      visibleBottomLocalY = Mathf.Min(visibleBottomLocalY, TempImages[colIndex].slotImages[r].transform.localPosition.y);
-    float visibleBottomCanvasY = topSlotImageY + visibleBottomLocalY;
-
-    float recycleThreshold = visibleBottomCanvasY - imageSpacing;
-
-    if (recycleCoroutines[colIndex] != null) StopCoroutine(recycleCoroutines[colIndex]);
-    recycleCoroutines[colIndex] = StartCoroutine(RecycleReel(slotTransform, images, imageSpacing, recycleThreshold));
-
-    Tweener tweener = slotTransform.DOLocalMoveY(slotTransform.localPosition.y - tweenHeight, 0.2f)
-      .SetLoops(-1, LoopType.Incremental)
-      .SetEase(Ease.Linear)
-      .SetDelay(0);
-    tweener.Play();
-    while (alltweens.Count <= colIndex) alltweens.Add(null);
-    alltweens[colIndex] = tweener;
+    float startY = slotTransform.localPosition.y;
+    Sequence seq = DOTween.Sequence();
+    seq.Append(slotTransform.DOLocalMoveY(bottomY, DurationFor(startY, bottomY, speed)).SetEase(Ease.Linear));
+    seq.AppendCallback(() =>
+    {
+      slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, topY);
+      reelTweens[index] = slotTransform.DOLocalMoveY(bottomY, DurationFor(topY, bottomY, speed))
+        .SetLoops(-1, LoopType.Restart)
+        .SetEase(Ease.Linear);
+    });
+    // Holding the intro sequence here means a Kill during the sweep stops the callback from
+    // ever running, so the loop tween can't be orphaned.
+    reelTweens[index] = seq;
   }
 
-  private IEnumerator RecycleReel(Transform slotTransform, Image[] images, float imageSpacing, float recycleThreshold)
+  private void StopReelSpin(Transform slotTransform, int index, float topY, float restY, float speed)
   {
-    while (true)
-    {
-      float parentLocalY = slotTransform.localPosition.y;
-      float maxLocalY = float.MinValue;
-      for (int i = 0; i < images.Length; i++)
-        maxLocalY = Mathf.Max(maxLocalY, images[i].transform.localPosition.y);
+    if (!slotTransform) return;
+    reelTweens[index]?.Kill();
+    slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, topY);
+    reelTweens[index] = slotTransform.DOLocalMoveY(restY, DurationFor(topY, restY, speed))
+      .SetEase(landEase, landOvershoot);
+  }
 
-      for (int i = 0; i < images.Length; i++)
-      {
-        if (parentLocalY + images[i].transform.localPosition.y < recycleThreshold)
-        {
-          Vector3 pos = images[i].transform.localPosition;
-          pos.y = maxLocalY + imageSpacing;
-          maxLocalY = pos.y;
-          images[i].transform.localPosition = pos;
-        }
-      }
+  // Lands one base column and holds for the stagger between reels, unless the player has
+  // pressed Stop, in which case the columns land back to back.
+  private IEnumerator StopBaseReel(int index)
+  {
+    StopReelSpin(Slot_Transform[index], index, ReelTopY, ReelRestY, reelSpeed);
+    if (StopSpinToggle)
       yield return null;
-    }
+    else
+      yield return new WaitForSeconds(0.2f);
   }
 
   private IEnumerator PlaySpecialWildReel()
@@ -1242,151 +1232,18 @@ public class SlotBehaviour : MonoBehaviour
     if (!SpecialReelObject || !SpecialReelTransform) yield break;
     SpecialReelObject.SetActive(true);
     if (MiddleReelObject) MiddleReelObject.SetActive(false);
-    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY);
+    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, SpecialReelRestY);
     yield return null;
-  }
-
-
-
-  private void InitializeSpecialReelTweening()
-  {
-    if (!SpecialReelTransform) return;
-    SpecialReelTransform.DOKill();
-    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY);
-
-    List<Image> imageList = new List<Image>();
-    foreach (Image img in SpecialReelTransform.GetComponentsInChildren<Image>())
-      if (img.transform != SpecialReelTransform) imageList.Add(img);
-    _specialReelImages = imageList.ToArray();
-    System.Array.Sort(_specialReelImages, (a, b) => b.transform.localPosition.y.CompareTo(a.transform.localPosition.y));
-
-    _specialReelImageInitialLocalY = new float[_specialReelImages.Length];
-    for (int i = 0; i < _specialReelImages.Length; i++)
-      _specialReelImageInitialLocalY[i] = _specialReelImages[i].transform.localPosition.y;
-
-    float imageSpacing = _specialReelImages.Length > 1
-      ? Mathf.Abs(_specialReelImages[0].transform.localPosition.y - _specialReelImages[1].transform.localPosition.y)
-      : 150f;
-
-    float visibleBottomLocalY = float.MaxValue;
-    for (int r = 0; r < numberOfRows && r < TempImages[1].slotImages.Count; r++)
-      visibleBottomLocalY = Mathf.Min(visibleBottomLocalY, TempImages[1].slotImages[r].transform.localPosition.y);
-    float recycleThreshold = topSlotImageY + visibleBottomLocalY - imageSpacing;
-
-    if (_specialReelRecycleCoroutine != null) StopCoroutine(_specialReelRecycleCoroutine);
-    _specialReelRecycleCoroutine = StartCoroutine(RecycleReel(SpecialReelTransform, _specialReelImages, imageSpacing, recycleThreshold));
-
-    _specialReelSpinTween = SpecialReelTransform.DOLocalMoveY(SpecialReelTransform.localPosition.y - tweenHeight, 0.2f / specialReelSpeedMultiplier)
-      .SetLoops(-1, LoopType.Incremental)
-      .SetEase(Ease.Linear);
-    _specialReelSpinTween.Play();
-
-    if (_specialReelDebugWatcher != null) StopCoroutine(_specialReelDebugWatcher);
-    _specialReelDebugWatcher = StartCoroutine(SpecialReelDebugWatcher());
-  }
-
-  private IEnumerator SpecialReelDebugWatcher()
-  {
-    while (true)
-    {
-      if (_specialReelImages != null && SpecialReelTransform)
-      {
-        float parentY = SpecialReelTransform.localPosition.y;
-        var positions = new System.Text.StringBuilder();
-        foreach (var img in _specialReelImages)
-          positions.Append((parentY + img.transform.localPosition.y).ToString("F0")).Append(",");
-        bool tweenActive = _specialReelSpinTween != null && _specialReelSpinTween.IsActive();
-        bool tweenPlaying = tweenActive && _specialReelSpinTween.IsPlaying();
-        Debug.Log($"[SpecialReel DEBUG] time={Time.time:F2} parentY={parentY:F1} tweenActive={tweenActive} tweenPlaying={tweenPlaying} positions={positions}");
-      }
-      yield return new WaitForSeconds(1f);
-    }
-  }
-
-  private void StopSpecialReelTweening()
-  {
-    if (!SpecialReelTransform) return;
-    if (audioController) audioController.StopSpecialReelSpin();
-    _specialReelSpinTween?.Kill();
-    _specialReelSpinTween = null;
-    if (_specialReelRecycleCoroutine != null)
-    {
-      StopCoroutine(_specialReelRecycleCoroutine);
-      _specialReelRecycleCoroutine = null;
-    }
-    if (_specialReelDebugWatcher != null)
-    {
-      StopCoroutine(_specialReelDebugWatcher);
-      _specialReelDebugWatcher = null;
-    }
-    if (_specialReelImages != null)
-    {
-      for (int i = 0; i < _specialReelImages.Length; i++)
-      {
-        Vector3 pos = _specialReelImages[i].transform.localPosition;
-        pos.y = _specialReelImageInitialLocalY[i];
-        _specialReelImages[i].transform.localPosition = pos;
-      }
-    }
-    SpecialReelTransform.localPosition = new Vector2(SpecialReelTransform.localPosition.x, topSlotImageY - reelLandingDropOffset);
-    SpecialReelTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad);
-  }
-
-  private IEnumerator StopTweening(int reqpos, Transform slotTransform, int index, bool isStop, float duration = 0.5f)
-  {
-    alltweens[index].Kill();
-
-    if (recycleCoroutines[index] != null)
-    {
-      StopCoroutine(recycleCoroutines[index]);
-      recycleCoroutines[index] = null;
-    }
-
-    if (reelImages[index] != null)
-    {
-      for (int i = 0; i < reelImages[index].Length; i++)
-      {
-        Vector3 pos = reelImages[index][i].transform.localPosition;
-        pos.y = reelImageInitialLocalY[index][i];
-        reelImages[index][i].transform.localPosition = pos;
-      }
-    }
-
-    slotTransform.localPosition = new Vector2(slotTransform.localPosition.x, topSlotImageY - reelLandingDropOffset);
-    // Debug.Log($"[ReelLanding DEBUG] reel {index} snap: isStop={isStop} dropOffset={reelLandingDropOffset:F2} snapY={slotTransform.localPosition.y:F2} time={Time.time:F3}");
-    alltweens[index] = slotTransform.DOLocalMoveY(topSlotImageY, 0.25f).SetEase(Ease.OutQuad);
-    // .OnComplete(() => Debug.Log($"[ReelLanding DEBUG] reel {index} rise COMPLETE finalY={slotTransform.localPosition.y:F2} time={Time.time:F3}"));
-    if (!isStop)
-    {
-      yield return new WaitForSeconds(0.2f);
-    }
-    else
-    {
-      yield return null;
-    }
-    // Debug.Log($"[ReelLanding DEBUG] reel {index} StopTweening returning: currentY={slotTransform.localPosition.y:F2} tweenActive={alltweens[index].IsActive()} tweenPlaying={(alltweens[index].IsActive() && alltweens[index].IsPlaying())} time={Time.time:F3}");
   }
 
 
 
   private void KillAllTweens()
   {
-    for (int i = 0; i < numberOfSlots; i++)
+    for (int i = 0; i < reelTweens.Length; i++)
     {
-      alltweens[i].Kill();
-      if (recycleCoroutines[i] != null)
-      {
-        StopCoroutine(recycleCoroutines[i]);
-        recycleCoroutines[i] = null;
-      }
-    }
-    alltweens.Clear();
-    _specialReelSpinTween?.Kill();
-    _specialReelSpinTween = null;
-    if (_specialReelRecycleCoroutine != null)
-    {
-      StopCoroutine(_specialReelRecycleCoroutine);
-      _specialReelRecycleCoroutine = null;
+      reelTweens[i]?.Kill();
+      reelTweens[i] = null;
     }
   }
   #endregion
