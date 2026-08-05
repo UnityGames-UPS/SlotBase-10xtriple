@@ -14314,7 +14314,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1252243038
 RectTransform:
   m_ObjectHideFlags: 0
@@ -23980,7 +23980,6 @@ MonoBehaviour:
     - {fileID: 1666902360}
     - {fileID: 899343982}
     - {fileID: 2021207588}
-  specialReelSwapDelay: 1
   reelSpeed: 9000
   specialReelSpeed: 2500
   ReelTopY: 3885
