@@ -358,6 +358,13 @@ public class SlotBehaviour : MonoBehaviour
     }
   }
 
+  internal void UpdateBalanceDisplay(double newBalance)
+  {
+    currentBalance = newBalance;
+    if (Balance_text) Balance_text.text = newBalance.ToString("F3");
+    CompareBalance();
+  }
+
   #region LinesCalculation
   //Fetch Lines from backend
   internal void FetchLines(string LineVal, int count)

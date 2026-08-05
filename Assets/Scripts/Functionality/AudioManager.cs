@@ -60,6 +60,7 @@ public class AudioManager : MonoBehaviour
 
     internal void SetMusicEnabled(bool on)
     {
+        ClearForcedMute();
         _musicEnabled = on;
         PlayerPrefs.SetInt(PrefKeyMusic, on ? 1 : 0);
         PlayerPrefs.Save();
@@ -68,6 +69,7 @@ public class AudioManager : MonoBehaviour
 
     internal void SetSfxEnabled(bool on)
     {
+        ClearForcedMute();
         _sfxEnabled = on;
         PlayerPrefs.SetInt(PrefKeySFX, on ? 1 : 0);
         PlayerPrefs.Save();
@@ -171,18 +173,30 @@ public class AudioManager : MonoBehaviour
 
     // ── Focus Handling ────────────────────────────────────────────────────────
 
+    private bool isForceMuted = false;
+
+    // Called from BOTH the JS-driven UIManager.OnFocusChanged path and OnApplicationFocus below.
+    internal void SetMuteAll(bool forceMute)
+    {
+        if (forceMute == isForceMuted) return;
+        isForceMuted = forceMute;
+        AudioListener.volume = forceMute ? 0f : 1f;
+    }
+
+    // An explicit user interaction always wins over a stale/stuck forced-mute.
+    private void ClearForcedMute()
+    {
+        isForceMuted = false;
+        AudioListener.volume = 1f;
+    }
+
     private void OnApplicationFocus(bool hasFocus)
     {
-        HandleFocus(hasFocus);
+        SetMuteAll(!hasFocus);
     }
 
     private void OnApplicationPause(bool isPaused)
     {
-        HandleFocus(!isPaused);
-    }
-
-    private void HandleFocus(bool hasFocus)
-    {
-        AudioListener.volume = hasFocus ? 1f : 0f;
+        SetMuteAll(isPaused);
     }
 }

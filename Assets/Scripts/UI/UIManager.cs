@@ -252,10 +252,28 @@ public class UIManager : MonoBehaviour
   [SerializeField]
   private SlotBehaviour slotManager;
 
+  [Header("Focus / Lifecycle")]
+  [SerializeField] private JSFunctCalls jsFunctCalls;
+  [SerializeField] private SocketIOManager socketManager;
+
   private Tween _balanceTween;
   private bool isMusic = true;
   private bool isSound = true;
   internal bool isExit = false;
+
+  private void Awake()
+  {
+    if (jsFunctCalls != null)
+      jsFunctCalls.RegisterVisibilityListener(gameObject.name);
+  }
+
+  public void OnFocusChanged(string value)
+  {
+    bool focused = value == "1";
+    Debug.Log("UNITY FOCUS CHANGED: " + value + " (focused: " + focused + ")");
+    audioManager?.SetMuteAll(!focused);
+    socketManager?.HandleFocusChange(focused);
+  }
 
   private void Start()
   {
