@@ -1619,8 +1619,8 @@ MonoBehaviour:
   GameExit_Button: {fileID: 0}
   Home_Button: {fileID: 1035774565}
   slotManager: {fileID: 2073624787}
-  jsFunctCalls: {fileID: 0}
-  socketManager: {fileID: 0}
+  jsFunctCalls: {fileID: 1728521618}
+  socketManager: {fileID: 7610637854078187665}
 --- !u!1 &117937206
 GameObject:
   m_ObjectHideFlags: 0
@@ -2565,140 +2565,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 163614923}
   m_CullTransparentMesh: 1
---- !u!1 &173773589
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 173773590}
-  - component: {fileID: 173773593}
-  - component: {fileID: 173773592}
-  - component: {fileID: 173773591}
-  m_Layer: 5
-  m_Name: CoinFallingAnimation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &173773590
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173773589}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 238673878}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &173773591
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173773589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d9ae1bf2ec654621a0c3eaff2a909fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ImageAnimation
-  textureArray:
-  - {fileID: 21300000, guid: 7d055199c46f8114e8300c089fbbbf19, type: 3}
-  - {fileID: 21300000, guid: 51ecf67c25392474e9c118367567da00, type: 3}
-  - {fileID: 21300000, guid: 33f6d09f6f4e75b43bdfe20d03779ba8, type: 3}
-  - {fileID: 21300000, guid: 71ebe2ce012e62c46b4c7ea0754d3da1, type: 3}
-  - {fileID: 21300000, guid: c1b589a32b88ad044a76dea2f7f6002c, type: 3}
-  - {fileID: 21300000, guid: bbdf19e3c5b3bb644b2d21a6043a2300, type: 3}
-  - {fileID: 21300000, guid: 5b0fe6e079157e9419cd31942c849b0c, type: 3}
-  - {fileID: 21300000, guid: 2d11f8a35cea14844be46088e9aaa1ce, type: 3}
-  - {fileID: 21300000, guid: c575e6aad31608e4f81ff76f49362d16, type: 3}
-  - {fileID: 21300000, guid: 44ae599a5dcd2244cb47e48e298a43f6, type: 3}
-  - {fileID: 21300000, guid: bc5fa01e24366854da6509b04dc0e1b9, type: 3}
-  - {fileID: 21300000, guid: 1d96386b321603d449f455abd0624e6f, type: 3}
-  - {fileID: 21300000, guid: e5db6afc66fd43945bb470f41cd0279c, type: 3}
-  - {fileID: 21300000, guid: 28a6a5cee11c4e14f9752a5b2c5ef521, type: 3}
-  - {fileID: 21300000, guid: 6f9bc9d80c1c9bb4ca5e4631f8c6a65b, type: 3}
-  - {fileID: 21300000, guid: 1e6f7dd151aba7c4990e64b1eb293dbe, type: 3}
-  - {fileID: 21300000, guid: 3dd50ca25886f9e4eacc122f50a05914, type: 3}
-  - {fileID: 21300000, guid: 0e87e10a1c65172439f88d5d12220365, type: 3}
-  - {fileID: 21300000, guid: eb86bc6d09742bd468fc47530b319602, type: 3}
-  - {fileID: 21300000, guid: 5a3e021b088419f4595265572ee618a1, type: 3}
-  - {fileID: 21300000, guid: 393ca7c778a26fe4394e91d7fa0da483, type: 3}
-  - {fileID: 21300000, guid: 132ffc46c6f97b34c8bf1da8e344fa04, type: 3}
-  - {fileID: 21300000, guid: 916cc2d03ba92354b81c01b3eb5aca30, type: 3}
-  - {fileID: 21300000, guid: b6b6ba3307858d746b3d4c62e8dfc26e, type: 3}
-  - {fileID: 21300000, guid: 9fb7d1b3881dc314c85000fc19837d5d, type: 3}
-  - {fileID: 21300000, guid: 30118d4a755460a488e470b3745b95b9, type: 3}
-  - {fileID: 21300000, guid: 8efed1a1f657b39438aa861c3a29bdc0, type: 3}
-  - {fileID: 21300000, guid: 1382b149fd61fff4f9859ed0da8ef07a, type: 3}
-  - {fileID: 21300000, guid: 4bfd0e2e1ecd1fd4bac903049fbe9c9a, type: 3}
-  - {fileID: 21300000, guid: ee61bb8b9729c5a4a89440f0817f26a5, type: 3}
-  - {fileID: 21300000, guid: 5bf892e73c2a16f409259b043dc46e05, type: 3}
-  - {fileID: 21300000, guid: fd82848f09876e844954ca0daa947f98, type: 3}
-  - {fileID: 21300000, guid: b63178bbd67809645a0568569cc5700d, type: 3}
-  - {fileID: 21300000, guid: b5814f2ea036fb141b9d305591173b1c, type: 3}
-  - {fileID: 21300000, guid: 680de1d1b8e38a844912b7942eb1a44b, type: 3}
-  - {fileID: 21300000, guid: 6f99cee2f444f134b91e99e9cbbdfe44, type: 3}
-  - {fileID: 21300000, guid: 7a78d0b2a81d8314a886174b3147529e, type: 3}
-  rendererDelegate: {fileID: 173773592}
-  useSharedMaterial: 1
-  doLoopAnimation: 0
-  StartOnAwake: 1
-  currentAnimationState: 0
-  idealFrameRate: 0.041666668
-  AnimationSpeed: 12
-  delayBetweenLoop: 0
---- !u!114 &173773592
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173773589}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 8995154407686431259, guid: 9c6b8b4c7daa5ee408ad6753d9aebea5, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &173773593
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 173773589}
-  m_CullTransparentMesh: 1
 --- !u!1 &180555560
 GameObject:
   m_ObjectHideFlags: 0
@@ -3546,8 +3412,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1033571760}
-  - {fileID: 173773590}
   - {fileID: 1112380070}
   m_Father: {fileID: 2040380323}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -11578,103 +11442,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -475}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1033571759
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1033571760}
-  - component: {fileID: 1033571762}
-  - component: {fileID: 1033571761}
-  - component: {fileID: 1033571763}
-  m_Layer: 5
-  m_Name: CashFallingAnimation
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1033571760
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033571759}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 238673878}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1920, y: 1080}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1033571761
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033571759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 8995154407686431259, guid: 9c6b8b4c7daa5ee408ad6753d9aebea5, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
---- !u!222 &1033571762
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033571759}
-  m_CullTransparentMesh: 1
---- !u!114 &1033571763
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1033571759}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d9ae1bf2ec654621a0c3eaff2a909fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ImageAnimation
-  textureArray: []
-  rendererDelegate: {fileID: 1033571761}
-  useSharedMaterial: 1
-  doLoopAnimation: 1
-  StartOnAwake: 0
-  currentAnimationState: 0
-  idealFrameRate: 0.041666668
-  AnimationSpeed: 5
-  delayBetweenLoop: 0
 --- !u!1 &1035774563
 GameObject:
   m_ObjectHideFlags: 0
@@ -25190,7 +24957,7 @@ MonoBehaviour:
   slotManager: {fileID: 2073624787}
   uiManager: {fileID: 117472470}
   JSManager: {fileID: 1728521618}
-  testToken: 620e77e576a445bfb3d17e8a58aa45c3
+  testToken: afb05c07f4de4fd49db8a197077e2918
   RaycastBlocker: {fileID: 408972440}
 --- !u!82 &7671732009833053296
 AudioSource:
